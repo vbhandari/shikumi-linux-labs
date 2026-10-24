@@ -20,7 +20,7 @@ cd shikumi-linux-labs
 ./vm/multipass.sh            # or: cd vm && vagrant up
 ```
 
-cloud-init (Multipass) or `provision.sh` (Vagrant) installs the course packages and clones the repo to `~/shikumi-linux-labs` inside the VM. Then, inside the VM:
+cloud-init (Multipass) or `provision.sh` (Vagrant) installs the course packages and clones the repo again, from GitHub, to `~/shikumi-linux-labs` inside the VM; the VM does not share the host's copy. Then, inside the VM (`multipass shell shikumi` or `vagrant ssh`):
 
 ```bash
 ~/shikumi-linux-labs/bin/shikumi-check env
@@ -31,7 +31,7 @@ To get updates later: `git -C ~/shikumi-linux-labs pull`.
 ## How the labs work
 
 - Each lab has its own folder under [`labs/`](labs/) with a `README.md` (goal, steps, checks, stretch challenge, cleanup) and three scripts:
-  - `setup.sh` is step 0. It copies the lab's files to `~/labs/<lab>` and checks prerequisites. Running it again restores the tested files.
+  - `setup.sh` is step 0 in every lab from 1.1 on (Lab 0.1 runs it once the VM and the repo exist). It copies the lab's files to `~/labs/<lab>` and checks prerequisites. Running it again restores the tested files.
   - `check.sh` verifies the result without changing anything, and exits 0 or 1. Run it as `bin/shikumi-check lab <lab>`, for example `bin/shikumi-check lab 5.1`.
   - `cleanup.sh` undoes the lab. It is safe to run twice, and it keeps what later labs build on; the README says when to run it.
 - A few labs have a script that runs from the repo rather than from `~/labs`: `labs/15.1-deploy-the-stack/deploy.sh` and `labs/15.2-incident-drills/break.sh`. Scripts the lab works on, such as `mystery.sh` in Lab 14.1, are in the lab's `files/` folder and `setup.sh` copies them.
@@ -140,9 +140,9 @@ About 18 hours of lab time in total.
 | `/healthz` | Answers `{"status": "ok"}` | everywhere |
 | `/slow?ms=N` | Waits N ms without blocking other requests | 3.2, 7.2, 14.4 |
 | `/cpu?ms=N` | Busy-loops for N ms | your own experiments |
-| `/checksum?kb=N` | Checksums N KB in pure Python (`SHIKUMI_FAST_CHECKSUM=1` uses zlib) | 14.3, 15.2 |
-| `/alloc?mb=N` | Allocates and keeps N MB | 15.2 |
-| `/files?n=N` | Opens and keeps N file descriptors | 3.3, 15.2 |
+| `/checksum?kb=N` | Checksums N KB in pure Python (`SHIKUMI_FAST_CHECKSUM=1` uses zlib) | 14.3 |
+| `/alloc?mb=N` | Allocates and keeps N MB | your own experiments |
+| `/files?n=N` | Opens and keeps N file descriptors | 3.3 |
 | `/data?name=F` | Reads F from the data directory, and caches it when `SHIKUMI_CACHE=1` | 5.1, 5.3, 6.1, 6.2 |
 
 Settings come from flags or the environment: `SHIKUMI_HOST`, `SHIKUMI_PORT`, `SHIKUMI_DATA_DIR` (else systemd's `STATE_DIRECTORY`), `SHIKUMI_CACHE_DIR` (else `CACHE_DIRECTORY`), `SHIKUMI_CACHE`. On SIGTERM it stops accepting and lets in-flight requests finish.
@@ -151,6 +151,8 @@ Settings come from flags or the environment: `SHIKUMI_HOST`, `SHIKUMI_PORT`, `SH
 
 Every push runs shellcheck, `py_compile` and the unit tests (Python 3.12 and 3.14), an `apparmor_parser` syntax check, `systemd-analyze verify` on the units, a bpftrace dry run, a build of Appendix C, and a markdown link check, on GitHub's `ubuntu-26.04` runners. None of this replaces running the labs on a real VM.
 
----
+## Copyright
 
 © 2026 Vinay Bhandari and Shikumi Labs. All rights reserved.
+
+This is not open-source software. See [LICENSE](https://github.com/vbhandari/shikumi-linux-labs/blob/main/LICENSE). The repository is public so learners can clone it; no rights to reuse or redistribute are granted.

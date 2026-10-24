@@ -17,44 +17,72 @@
 
 Steps are for Ubuntu 26.04 LTS.
 
-### Step 0: Copy the lab files.
+### Step 1: On the host, check the prerequisites.
 
 ```bash
-~/shikumi-linux-labs/labs/00.1-provision-and-verify/setup.sh
-cd ~/labs/0.1
+git --version
+multipass version        # or: vagrant --version && vagrant plugin list
 ```
 
-### Step 1: On the host, fetch the repo and create the VM with Multipass.
+You need `git`, and either Multipass or Vagrant with a provider (VirtualBox, VMware or Parallels). The VM takes 2 vCPU, 4 GB RAM and 20 GB disk.
+
+### Step 2: On the host, clone the repo.
 
 ```bash
 git clone https://github.com/vbhandari/shikumi-linux-labs.git
 cd shikumi-linux-labs
-./vm/multipass.sh
-multipass shell shikumi
 ```
 
-cloud-init installs the course packages and clones the repo to `~/shikumi-linux-labs` inside the VM. It takes a few minutes.
+The host copy is only for creating the VM: it holds `vm/multipass.sh`, `vm/cloud-init.yaml` and `vm/Vagrantfile`.
 
-### Step 2: Or create it with Vagrant instead.
+### Step 3: On the host, create the VM with Multipass.
 
 ```bash
-cd shikumi-linux-labs/vm
+./vm/multipass.sh
+```
+
+This launches Ubuntu 26.04 as `shikumi` with `vm/cloud-init.yaml`, and waits until cloud-init has finished. cloud-init runs `vm/provision.sh`, which installs the course packages. It takes a few minutes.
+
+### Step 4: Or create it with Vagrant instead.
+
+```bash
+cd vm
 vagrant up
+```
+
+The default machine is `ubuntu` (box `bento/ubuntu-26.04`, 2 vCPU, 4 GB RAM). Vagrant runs `vm/provision.sh` as its provisioner. Run every later `vagrant` command from this `vm/` folder.
+
+### Step 5: Get into the VM.
+
+```bash
+multipass shell shikumi
+# or, with Vagrant:
 vagrant ssh
 ```
 
-The default machine is `bento/ubuntu-26.04` with 2 vCPU and 4 GB RAM.
+From here on, every command runs inside the VM unless a step says *on the host*.
 
-### Step 3: Inside the VM, check the environment.
+### Step 6: Inside the VM, make sure the repo is there.
 
 ```bash
+cd ~
+[ -d ~/shikumi-linux-labs/.git ] || git clone https://github.com/vbhandari/shikumi-linux-labs.git ~/shikumi-linux-labs
+git -C ~/shikumi-linux-labs log -1 --oneline
+```
+
+The VM has its own clone in your home directory, `~/shikumi-linux-labs`: cloud-init (Multipass) or `provision.sh --clone vagrant` (Vagrant) cloned it from GitHub during provisioning. Nothing is shared with the host's copy: Multipass mounts nothing and the Vagrant synced folder is turned off. The second line clones it now if provisioning could not. To update later, run `git -C ~/shikumi-linux-labs pull` inside the VM.
+
+### Step 7: Run the lab setup and the environment check.
+
+```bash
+~/shikumi-linux-labs/labs/00.1-provision-and-verify/setup.sh
 cd ~/shikumi-linux-labs
 ./bin/shikumi-check env
 ```
 
-Every line under *Required tools* should say PASS. If you built the VM by hand, run `sudo bash vm/provision.sh` first.
+Every line under *Required tools* should say PASS. If any is missing, provisioning did not finish: run `sudo bash vm/provision.sh`, then check again. From Lab 1.1 on, every lab starts the same way, with its `setup.sh` as step 0.
 
-### Step 4: Try the five shell essentials you will use in every lab.
+### Step 8: Try the five shell essentials you will use in every lab.
 
 ```bash
 sudo -v; echo "exit status: $?"
@@ -63,11 +91,12 @@ man unshare      # q to quit
 journalctl -b | less   # q to quit
 ```
 
-### Step 5: On the host, take a snapshot to return to later.
+### Step 9: Leave the VM and, on the host, take the clean snapshot.
 
 ```bash
+exit
 multipass stop shikumi && multipass snapshot shikumi --name clean && multipass start shikumi
-# or, with Vagrant:
+# or, with Vagrant (from vm/):
 vagrant snapshot save ubuntu clean
 ```
 

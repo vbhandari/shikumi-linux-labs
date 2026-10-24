@@ -44,19 +44,9 @@ python3 ~/shikumi-linux-labs/app/loadgen.py http://127.0.0.1:8001/healthz -n 50 
 
 ### Step 3: Diagnose and fix it.
 
-Work outwards from the symptom: the journal (`journalctl -u 'shikumi-api@*' -k -p warning`), `systemctl status`, `ss`, `lsof`, `df`, `top` and `pidstat`, `perf`, `tc`. Each fault is something an earlier lab taught:
+Work outwards from the symptom with the tools from the course: the journal (`journalctl -u 'shikumi-api@*' -k -p warning`), `systemctl status` and `systemctl list-units 'shikumi-*'`, `ss`, `lsof`, `df` and `findmnt`, `top` and `pidstat`, `perf`, `tc`, `aa-status`. Each fault is something an earlier lab taught, and each one shows up as a symptom first: errors, slow answers, or a check that fails.
 
-| Drill | Earlier lab |
-|---|---|
-| 1 | 3.3, 5.1 |
-| 2 | 10.1 |
-| 3 | 2.1 |
-| 4 | 6.1 |
-| 5 | 8.3 |
-| 6 | 14.3 |
-| 7 | 11.4 |
-
-Fix the cause, not just the symptom. For a drop-in that should not be there, remove it and reload; for a runaway process, stop its unit.
+Fix the cause, not just the symptom, and leave `--undo` for when you are stuck. Write down what you saw, what you ran and what fixed it: that note is the real output of this lab.
 
 ### Step 4: Confirm the fix.
 
@@ -68,7 +58,7 @@ Then inject the next fault, 2 to 7. If you are stuck, `sudo .../break.sh --undo`
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
-> Drill 4 appears as an SELinux denial on Fedora (`ausearch -m avc -ts recent`). `break.sh` targets Ubuntu only.
+> `break.sh` targets Ubuntu only. On Fedora, any denial you meet is SELinux's: `ausearch -m avc -ts recent`.
 
 ## Checks (expected output)
 
@@ -77,7 +67,7 @@ Then inject the next fault, 2 to 7. If you are stuck, `sudo .../break.sh --undo`
 ```
 
 - Both instances are active, answer `/data` with 200, and `https://localhost/healthz` answers 200
-- No fault is left: no tight file limit, no CLOSE_WAIT, no full drill filesystem or deleted-open files, no memory cap, no runaway load, no netem on `lo`
+- Every drill you injected reads `fault N cleared`
 - p50 latency to `@8001` is below 50 ms
 
 ## Stretch challenge
