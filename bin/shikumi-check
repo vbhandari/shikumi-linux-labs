@@ -1,0 +1,77 @@
+#!/bin/bash
+# shikumi-check env       describe this machine and list missing tools
+# shikumi-check lab ID    run one lab's check.sh (for example: shikumi-check lab 5.1)
+set -uo pipefail
+# shellcheck source=bin/lib.sh
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+
+REQUIRED=(git curl python3 strace lsof ss ip nft tcpdump jq fincore unshare nsenter
+          lsns pivot_root systemd-run systemd-analyze iostat fio iperf3 gdb perf
+          bpftrace podman setfacl getcap)
+
+coreutils_impl() {
+  if cat --version 2>/dev/null | head -n1 | grep -q uutils; then echo "uutils (Rust)"
+  else echo "GNU"; fi
+}
+
+sudo_impl() {
+  local v
+  v="$(sudo -V 2>/dev/null | head -n1)"
+  case "$v" in
+    *sudo-rs*) echo "sudo-rs (Rust)" ;;
+    Sudo*)     echo "sudo.ws (classic)" ;;
+    *)         echo "not installed" ;;
+  esac
+}
+
+mac_state() {
+  if command -v getenforce >/dev/null && [[ "$(getenforce 2>/dev/null)" != Disabled ]]; then
+    echo "SELinux $(getenforce)"
+  elif [[ "$(cat /sys/module/apparmor/parameters/enabled 2>/dev/null)" == Y ]]; then
+    echo "AppArmor enabled"
+  else
+    echo "none detected"
+  fi
+}
+
+sysctl_or_na() {
+  cat "/proc/sys/${1//.//}" 2>/dev/null || echo "n/a"
+}
+
+env_report() {
+  local fam mem disk virt
+  fam="$(distro_family)"
+  mem="$(awk '/MemTotal/ {printf "%.1f GB", $2/1048576}' /proc/meminfo)"
+  disk="$(df -h --output=avail "$HOME" 2>/dev/null | tail -n1 | tr -d ' ')"
+  virt="$(systemd-detect-virt 2>/dev/null || true)"
+  say "Distro          $(. /etc/os-release && echo "$PRETTY_NAME") [$fam]"
+  say "Kernel          $(uname -r) ($(uname -m))"
+  say "Virtualisation  ${virt:-none}"
+  say "PID 1           $(cat /proc/1/comm)"
+  say "cgroup          $(stat -fc %T /sys/fs/cgroup 2>/dev/null)"
+  say "BTF             $([[ -r /sys/kernel/btf/vmlinux ]] && echo present || echo missing)"
+  say "MAC             $(mac_state)"
+  say "userns restrict $(sysctl_or_na kernel.apparmor_restrict_unprivileged_userns)"
+  say "ptrace_scope    $(sysctl_or_na kernel.yama.ptrace_scope)"
+  say "coreutils       $(coreutils_impl)"
+  say "sudo            $(sudo_impl)"
+  say "Memory          $mem"
+  say "Free disk       ${disk:-unknown} in $HOME"
+  say ""
+  say "Required tools:"
+  need_cmd "${REQUIRED[@]}"
+  check "systemd is PID 1" test "$(cat /proc/1/comm)" = systemd
+  check "cgroup v2" test "$(stat -fc %T /sys/fs/cgroup 2>/dev/null)" = cgroup2fs
+  finish
+}
+
+case "${1:-env}" in
+  env) env_report ;;
+  lab)
+    id="${2:?usage: shikumi-check lab ID}"
+    [[ "$id" == *.* ]] || { say "lab ID looks like 5.1"; exit 2; }
+    dir="$(lab_dir "$id")" || { say "no lab $id"; exit 2; }
+    exec "$dir/check.sh"
+    ;;
+  *) say "usage: shikumi-check [env | lab ID]"; exit 2 ;;
+esac

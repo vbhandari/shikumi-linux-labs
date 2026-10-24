@@ -1,0 +1,38 @@
+#!/bin/bash
+# Remove everything the course labs install or change. Asks before it starts.
+set -uo pipefail
+# shellcheck source=bin/lib.sh
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+
+read -r -p "Remove all course units, profiles, configs, users and lab files? [y/N] " answer
+[[ "$answer" == [yY] ]] || exit 0
+
+as_root "$SHIKUMI_REPO/labs/15.2-incident-drills/break.sh" --undo >/dev/null 2>&1
+units=(shikumi-api.service shikumi-api@8001.service shikumi-api@8002.service shikumi-prune.timer)
+as_root systemctl disable --now "${units[@]}" 2>/dev/null
+as_root rm -rf /etc/systemd/system/shikumi-api.service /etc/systemd/system/shikumi-api@.service \
+  /etc/systemd/system/shikumi-api.service.d /etc/systemd/system/shikumi-api@.service.d \
+  /etc/systemd/system/shikumi-prune.service /etc/systemd/system/shikumi-prune.timer
+as_root systemctl daemon-reload
+
+for p in opt.shikumi.bin.shikumi-api shikumi-unshare; do
+  [[ -f /etc/apparmor.d/$p ]] && as_root apparmor_parser -R "/etc/apparmor.d/$p" 2>/dev/null
+  as_root rm -f "/etc/apparmor.d/$p" "/etc/apparmor.d/local/$p"
+done
+as_root rm -f /usr/local/bin/shikumi-unshare
+
+as_root nft delete table inet shikumi 2>/dev/null
+as_root nft delete table ip shikumi_nat 2>/dev/null
+for ns in blue red; do as_root ip netns delete "$ns" 2>/dev/null; done
+as_root ip link delete veth-host 2>/dev/null
+as_root ip link delete veth-ctr 2>/dev/null
+
+as_root rm -f /etc/nginx/sites-enabled/shikumi /etc/nginx/sites-available/shikumi /etc/nginx/conf.d/shikumi.conf
+as_root rm -rf /etc/nginx/shikumi-tls
+as_root rm -f /etc/sudoers.d/90-shikumi-deploy
+as_root rm -rf /opt/shikumi /etc/shikumi /srv/shikumi /srv/shikumi-data /var/lib/shikumi /var/cache/shikumi
+getent passwd deployer >/dev/null && as_root userdel -r deployer 2>/dev/null
+getent passwd shikumi >/dev/null && as_root userdel shikumi
+getent group deploy >/dev/null && as_root groupdel deploy
+rm -rf "$LAB_HOME"
+say "Course state removed. ufw rules and installed packages were left as they are."

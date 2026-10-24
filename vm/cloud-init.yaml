@@ -1,0 +1,10 @@
+#cloud-config
+# Multipass: multipass launch 26.04 --name shikumi --cpus 2 --memory 4G --disk 20G \
+#            --cloud-init vm/cloud-init.yaml
+package_update: true
+packages:
+  - git
+runcmd:
+  - [runuser, -u, ubuntu, --, git, clone, "https://github.com/vbhandari/shikumi-linux-labs.git", /home/ubuntu/shikumi-linux-labs]
+  - [bash, /home/ubuntu/shikumi-linux-labs/vm/provision.sh]
+  - [runuser, -u, ubuntu, --, mkdir, -p, /home/ubuntu/labs]
