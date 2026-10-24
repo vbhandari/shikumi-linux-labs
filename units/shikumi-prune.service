@@ -1,0 +1,6 @@
+[Unit]
+Description=Remove old temporary files from the shikumi state directory
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/find /var/lib/shikumi -name '*.tmp' -mmin +60 -print -delete

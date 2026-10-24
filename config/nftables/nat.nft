@@ -1,0 +1,10 @@
+# Lab 11.3: masquerade traffic from the blue namespace.
+# Load:   sudo nft -f nat.nft
+# Remove: sudo nft delete table ip shikumi_nat
+
+table ip shikumi_nat {
+    chain postrouting {
+        type nat hook postrouting priority srcnat; policy accept;
+        ip saddr 10.200.1.0/24 counter masquerade
+    }
+}

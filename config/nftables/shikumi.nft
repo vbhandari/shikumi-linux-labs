@@ -1,0 +1,10 @@
+# Lab 11.1: our own table, next to the one ufw manages.
+# Load:   sudo nft -f shikumi.nft
+# Remove: sudo nft delete table inet shikumi
+
+table inet shikumi {
+    chain input {
+        type filter hook input priority 10; policy accept;
+        tcp dport 8011 counter drop
+    }
+}

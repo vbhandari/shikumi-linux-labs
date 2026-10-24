@@ -1,0 +1,4 @@
+# Lab 6.2: let shikumi-api write its cache.
+# Install: sudo install -m 0644 <this file> /etc/apparmor.d/local/
+/var/cache/shikumi/ rw,
+/var/cache/shikumi/** rwk,

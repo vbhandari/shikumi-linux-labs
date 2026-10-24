@@ -1,0 +1,29 @@
+# AppArmor profile for shikumi-api: the Lab 6.1 reference.
+# Install: sudo install -m 0644 <this file> /etc/apparmor.d/
+# Load:    sudo apparmor_parser -r /etc/apparmor.d/opt.shikumi.bin.shikumi-api
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+/opt/shikumi/bin/shikumi-api {
+  include <abstractions/base>
+  include <abstractions/python>
+
+  network inet stream,
+  network inet6 stream,
+
+  /opt/shikumi/bin/shikumi-api r,
+  /usr/bin/python3.[0-9]* ix,
+
+  /etc/shikumi/ r,
+  /etc/shikumi/** r,
+
+  /var/lib/shikumi/ r,
+  /var/lib/shikumi/** rwk,
+
+  @{PROC}/@{pid}/fd/ r,
+
+  # Site-specific additions (Lab 6.2 adds the cache directory here).
+  include if exists <local/opt.shikumi.bin.shikumi-api>
+}

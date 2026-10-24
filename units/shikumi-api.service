@@ -1,0 +1,17 @@
+[Unit]
+Description=shikumi-api sample service (Shikumi Labs)
+After=network.target
+
+[Service]
+Type=exec
+User=shikumi
+Group=shikumi
+EnvironmentFile=-/etc/shikumi/shikumi-api.env
+ExecStart=/opt/shikumi/bin/shikumi-api
+StateDirectory=shikumi
+CacheDirectory=shikumi
+Restart=on-failure
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

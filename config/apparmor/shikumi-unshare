@@ -1,0 +1,13 @@
+# Lab 13.1: grant user-namespace creation to one lab-only binary.
+# It confines nothing (unconfined) and only adds the userns permission,
+# the same shape Ubuntu ships for podman, runc and rootlesskit.
+
+abi <abi/4.0>,
+
+include <tunables/global>
+
+profile shikumi-unshare /usr/local/bin/shikumi-unshare flags=(unconfined) {
+  userns,
+
+  include if exists <local/shikumi-unshare>
+}
