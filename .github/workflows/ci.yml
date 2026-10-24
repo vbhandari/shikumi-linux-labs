@@ -70,9 +70,29 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - run: sudo apt-get update && sudo apt-get install -y bpftrace gcc make
-      - name: bpftrace --dry-run
-        continue-on-error: true   # needs BTF and BPF on the runner kernel
-        run: for f in bpf/*.bt; do sudo bpftrace --dry-run "$f"; done
+      # Parse and type-check every script without loading it: a syntax error
+      # or an unknown builtin fails the job.
+      - name: bpftrace parse check
+        run: |
+          for f in bpf/*.bt labs/14.4-ebpf-tools/files/*.bt; do
+            echo "== $f"; sudo bpftrace -l "$f" >/dev/null
+          done
+      # Loading and attaching depends on the runner's kernel, not on our
+      # scripts, so it only warns. The result goes in the job summary.
+      - name: bpftrace --dry-run (attach, informational)
+        continue-on-error: true
+        run: |
+          rc=0
+          for f in bpf/*.bt; do
+            if sudo timeout 60 bpftrace --dry-run "$f"; then
+              echo "- \`$f\`: attach OK" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "::warning file=$f::bpftrace --dry-run could not attach"
+              echo "- \`$f\`: attach FAILED (see log)" >> "$GITHUB_STEP_SUMMARY"
+              rc=1
+            fi
+          done
+          exit "$rc"
       - name: Build Appendix C
         run: make -C appendix-c CFLAGS='-O1 -g -Wall -Wextra -Werror'
 

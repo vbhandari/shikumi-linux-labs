@@ -149,7 +149,7 @@ Settings come from flags or the environment: `SHIKUMI_HOST`, `SHIKUMI_PORT`, `SH
 
 ## Checks in CI
 
-Every push runs shellcheck, `py_compile` and the unit tests (Python 3.12 and 3.14), an `apparmor_parser` syntax check, `systemd-analyze verify` on the units, a bpftrace dry run, a build of Appendix C, and a markdown link check, on GitHub's `ubuntu-26.04` runners. None of this replaces running the labs on a real VM.
+Every push runs shellcheck, `py_compile` and the unit tests (Python 3.12 and 3.14), an `apparmor_parser` syntax check, `systemd-analyze verify` on the units, a bpftrace parse check (plus an attach dry run that only warns), a build of Appendix C, and a markdown link check, on GitHub's `ubuntu-26.04` runners. None of this replaces running the labs on a real VM.
 
 ## Copyright
 
