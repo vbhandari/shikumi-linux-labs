@@ -14,6 +14,17 @@
 
 static void die(const char *what) { perror(what); exit(1); }
 
+/* write() may write less than asked: keep going until all of it is out. */
+static int write_all(int fd, const char *p, size_t len) {
+    while (len > 0) {
+        ssize_t w = write(fd, p, len);
+        if (w < 0) return -1;   /* includes EAGAIN: this demo drops a slow client */
+        p += w;
+        len -= (size_t)w;
+    }
+    return 0;
+}
+
 int main(void) {
     int one = 1;
     int lfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
@@ -47,11 +58,8 @@ int main(void) {
                 continue;
             }
             ssize_t got = read(fd, buf, sizeof buf);
-            if (got <= 0) {
+            if (got <= 0 || write_all(fd, buf, (size_t)got) < 0)
                 close(fd);          /* closing also removes it from the epoll set */
-                continue;
-            }
-            write(fd, buf, (size_t)got);
         }
     }
 }

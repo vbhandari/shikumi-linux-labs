@@ -56,10 +56,13 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v5
-      - name: Install the app where the units expect it
+      - name: Install the app and user the units expect
         run: |
           sudo useradd --system --no-create-home --shell /usr/sbin/nologin --user-group shikumi
           sudo install -D -m 0755 app/shikumi_api.py /opt/shikumi/bin/shikumi-api
+      - run: systemd-analyze --version | head -n 1
+      # The runner's own units can warn (for example CPUAccounting= removed in
+      # systemd 259); verify-units.sh only fails on messages about our units.
       - run: tests/verify-units.sh
 
   bpf-and-c:
@@ -81,9 +84,13 @@ jobs:
         uses: lycheeverse/lychee-action@v2
         with:
           args: --offline --no-progress './**/*.md'
+      # Fails on real breakage (404, DNS, TLS). Rate limits (429) and slow
+      # sites get retries rather than a red build. Lab-only addresses are skipped.
       - name: External links
-        continue-on-error: true
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --max-retries 2 --exclude 'localhost|127\.0\.0\.1|VM_IP|10\.200\.' './**/*.md'
-          fail: false
+          args: >-
+            --no-progress --max-retries 4 --retry-wait-time 10 --timeout 30
+            --accept '200..=299,429'
+            --exclude 'localhost|127\.0\.0\.1|VM_IP|10\.200\.|shikumi\.test'
+            './**/*.md'
