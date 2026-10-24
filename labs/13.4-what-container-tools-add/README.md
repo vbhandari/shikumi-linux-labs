@@ -60,11 +60,11 @@ systemd-cgls --no-pager --user-unit 2>/dev/null | grep -B 3 'sleep 600' || syste
 ### Step 5: Find its root filesystem.
 
 ```bash
-sudo nsenter -t "$PID" -m findmnt /
+sudo findmnt -N "$PID" -o TARGET,SOURCE,FSTYPE,OPTIONS /
 podman image inspect alpine:3.24 -f '{{.RootFS.Layers}}'
 ```
 
-The root is an overlay: read-only image layers below, a writable layer per container on top.
+`findmnt -N` runs the host's `findmnt` on the container's mount table (Alpine has no `findmnt`, so `nsenter -m findmnt` fails). The root is an overlay: read-only image layers below, a writable layer per container on top.
 
 ### Step 6: Find its capabilities and seccomp filter.
 

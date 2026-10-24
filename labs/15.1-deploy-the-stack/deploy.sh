@@ -4,10 +4,12 @@
 set -euo pipefail
 REPO="$(cd "$(dirname "$(readlink -f "$0")")/../.." && pwd)"
 [[ $EUID -eq 0 ]] || { echo "run with sudo"; exit 1; }
+command -v apt-get >/dev/null || { echo "deploy.sh covers Ubuntu only"; exit 1; }
 step() { printf '\n== %s\n' "$*"; }
 
 step "Packages"
 export DEBIAN_FRONTEND=noninteractive
+apt-get update -q >/dev/null
 apt-get install -y -q nginx apparmor-utils ufw openssl >/dev/null
 
 step "Persistent journal"

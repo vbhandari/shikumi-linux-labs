@@ -29,7 +29,7 @@ cd ~/labs/14.2
 python3 deadlock.py 2> stacks.txt
 ```
 
-`transfers=` grows, then freezes within a few seconds. Leave it hung.
+`transfers=` grows for about two seconds, then freezes when `report()` first takes its locks. Leave it hung.
 
 ### Step 2: In a second terminal, look at its threads.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Two threads take two locks in opposite order and eventually hang (Lab 14.2).
+"""Two threads take two locks in opposite order and hang (Lab 14.2).
 
 Send SIGUSR1 to dump every thread's Python stack to stderr.
 """
@@ -28,8 +28,10 @@ def transfer():
 
 
 def report():
-    first, second = (accounts, audit_log) if FIXED else (audit_log, accounts)
+    first, second = ((accounts, audit_log) if FIXED
+                     else (audit_log, accounts))
     while True:
+        time.sleep(2)  # report every 2 seconds
         with first:
             time.sleep(0.001)
             with second:

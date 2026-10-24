@@ -146,7 +146,8 @@ def make_socket(args):
 
 async def serve(args, ready=None):
     app = App(args)
-    server = await asyncio.start_server(app.handle, sock=make_socket(args))
+    server = await asyncio.start_server(
+        app.handle, sock=make_socket(args), backlog=args.backlog)
     stop = asyncio.Event()
     loop = asyncio.get_running_loop()
     for sig in (signal.SIGTERM, signal.SIGINT):
