@@ -1,0 +1,2 @@
+# Single quotes around code meant for another shell are intentional in these labs.
+disable=SC2016

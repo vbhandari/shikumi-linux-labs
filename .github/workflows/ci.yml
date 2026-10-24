@@ -1,0 +1,89 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# ubuntu-26.04 matches the course VM. ubuntu-latest moves to 26.04 during
+# Oct-Nov 2026; pinning keeps results stable either way.
+jobs:
+  shell:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck yamllint
+      - name: shellcheck
+        # labs/01.1-safe-scripts/files/deploy.sh is broken on purpose: Lab 1.1 fixes it.
+        run: |
+          mapfile -t files < <(git ls-files '*.sh' bin/ | grep -vx 'labs/01.1-safe-scripts/files/deploy.sh')
+          shellcheck -x "${files[@]}"
+      - name: bash -n
+        run: for f in $(git ls-files '*.sh' bin/); do bash -n "$f"; done
+      - name: yamllint
+        run: yamllint .github vm/cloud-init.yaml
+
+  python:
+    runs-on: ubuntu-26.04
+    strategy:
+      matrix:
+        python: ["3.12", "3.14"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m py_compile app/*.py labs/*/files/*.py
+      - run: python -W error::ResourceWarning -m unittest discover -s tests -v
+
+  apparmor:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y apparmor apparmor-utils
+      - name: apparmor_parser syntax check
+        run: |
+          for p in config/apparmor/opt.shikumi.bin.shikumi-api config/apparmor/shikumi-unshare; do
+            sudo apparmor_parser -QK "$p"
+          done
+          # Again with the Lab 6.2 local rule in place.
+          sudo install -D -m 0644 config/apparmor/local/opt.shikumi.bin.shikumi-api \
+            /etc/apparmor.d/local/opt.shikumi.bin.shikumi-api
+          sudo apparmor_parser -QK config/apparmor/opt.shikumi.bin.shikumi-api
+
+  systemd:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install the app where the units expect it
+        run: |
+          sudo useradd --system --no-create-home --shell /usr/sbin/nologin --user-group shikumi
+          sudo install -D -m 0755 app/shikumi_api.py /opt/shikumi/bin/shikumi-api
+      - run: tests/verify-units.sh
+
+  bpf-and-c:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y bpftrace gcc make
+      - name: bpftrace --dry-run
+        continue-on-error: true   # needs BTF and BPF on the runner kernel
+        run: for f in bpf/*.bt; do sudo bpftrace --dry-run "$f"; done
+      - name: Build Appendix C
+        run: make -C appendix-c CFLAGS='-O1 -g -Wall -Wextra -Werror'
+
+  links:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Relative links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress './**/*.md'
+      - name: External links
+        continue-on-error: true
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --max-retries 2 --exclude 'localhost|127\.0\.0\.1|VM_IP|10\.200\.' './**/*.md'
+          fail: false

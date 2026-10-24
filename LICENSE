@@ -1,0 +1,22 @@
+Copyright (c) 2026 Vinay Bhandari and Shikumi Labs. All rights reserved.
+
+This repository and all of its contents (lab instructions, source code,
+scripts, systemd unit files, AppArmor profiles, nginx, nftables and other
+configuration files, VM provisioning files and the Appendix C examples) are
+proprietary and are provided solely for use by learners enrolled in the
+Shikumi Labs Linux for Backend Engineers course, on their own lab machines,
+while taking the course.
+
+No license is granted to copy, modify, merge, publish, distribute,
+sublicense or sell any part of this repository, in whole or in part,
+except with the prior written permission of the copyright holders.
+Viewing the repository or cloning it to follow the course is not a grant
+of any other rights.
+
+This is not an open-source license.
+
+THE CONTENTS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY ARISING FROM THE USE OF THESE CONTENTS.
+
+© 2026 Vinay Bhandari and Shikumi Labs. All rights reserved.

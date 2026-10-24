@@ -1,0 +1,27 @@
+# Learner/runtime artifacts - never commit these
+*.img
+*.bin
+*.dat
+*.data
+*.data.old
+*.key
+*.csr
+*.srl
+*.svg
+rootfs/
+*.tar.gz
+
+# Appendix C build output
+appendix-c/epoll_echo
+appendix-c/deadlock
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editors / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
