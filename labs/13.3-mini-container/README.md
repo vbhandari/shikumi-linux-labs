@@ -106,8 +106,11 @@ ping -c 2 10.200.2.2
 ### Step 8: Compare with unshare --root, and use the script.
 
 ```bash
-sudo unshare --mount --pid --fork --root ~/labs/13.3/rootfs --mount-proc /bin/sh -c 'ps; ls /'
-sudo ./mini-container.sh rootfs /bin/sh -c 'echo "PID $$ on $(hostname)"; ps'
+sudo unshare --mount --pid --fork \
+  --root ~/labs/13.3/rootfs --mount-proc \
+  /bin/sh -c 'ps; ls /'
+sudo ./mini-container.sh rootfs \
+  /bin/sh -c 'echo "PID $$ on $(hostname)"; ps'
 ```
 
 `--root` uses `chroot`: simpler, but the old root is still mounted underneath, and a process with enough privilege can climb out. `pivot_root` detaches it.

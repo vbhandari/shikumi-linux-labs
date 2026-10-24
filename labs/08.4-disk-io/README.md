@@ -44,15 +44,19 @@ iostat -xz 1
 ### Step 3: Run a buffered random-write job for 30 seconds.
 
 ```bash
-fio --name=buffered --filename=fio.dat --size=256M --rw=randwrite --bs=4k \
-    --ioengine=psync --runtime=30 --time_based --group_reporting | tee buffered.txt
+fio --name=buffered --filename=fio.dat --size=256M \
+  --rw=randwrite --bs=4k --ioengine=psync \
+  --runtime=30 --time_based --group_reporting | \
+  tee buffered.txt
 ```
 
 ### Step 4: Run it again with fsync after every write.
 
 ```bash
-fio --name=fsync --filename=fio.dat --size=256M --rw=randwrite --bs=4k \
-    --ioengine=psync --runtime=30 --time_based --group_reporting --fsync=1 | tee fsync.txt
+fio --name=fsync --filename=fio.dat --size=256M \
+  --rw=randwrite --bs=4k --ioengine=psync \
+  --runtime=30 --time_based --group_reporting --fsync=1 | \
+  tee fsync.txt
 ```
 
 ### Step 5: Compare.

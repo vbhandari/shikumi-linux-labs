@@ -41,8 +41,11 @@ One thread serves all ten connections. It sleeps in `epoll_wait` until a socket 
 ### Step 2: Trace a threaded server under the same load.
 
 ```bash
-strace -f -o threads.txt python3 ~/shikumi-linux-labs/app/threaded_api.py & sleep 1
-python3 ~/shikumi-linux-labs/app/loadgen.py 'http://127.0.0.1:8100/slow' -c 10 -n 50
+strace -f -o threads.txt \
+  python3 ~/shikumi-linux-labs/app/threaded_api.py &
+sleep 1
+python3 ~/shikumi-linux-labs/app/loadgen.py \
+  'http://127.0.0.1:8100/slow' -c 10 -n 50
 pkill -f threaded_api.py; sleep 1
 grep -c clone3 threads.txt
 awk '{print $1}' threads.txt | sort -u | wc -l
@@ -53,7 +56,8 @@ Each connection gets a thread (`clone3`), and each thread blocks in its own `rec
 ### Step 3: Look at the io_uring switch.
 
 ```bash
-sysctl kernel.io_uring_disabled 2>/dev/null || echo "no io_uring_disabled switch on this kernel"
+sysctl kernel.io_uring_disabled 2>/dev/null || \
+  echo "no io_uring_disabled switch on this kernel"
 ```
 
 io_uring is completion-based: the program hands the kernel the I/O itself, not just a readiness question. Some systems turn it off by policy. Handout Appendix C1 has a minimal epoll server in C.

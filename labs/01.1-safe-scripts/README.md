@@ -38,7 +38,8 @@ It works, and wipes `important.txt` in the process. That is how this script is m
 ### Step 2: Put the live file back and run it with a release that does not exist.
 
 ```bash
-cp ~/shikumi-linux-labs/labs/01.1-safe-scripts/files/site/current/important.txt site/current/
+SRC=~/shikumi-linux-labs/labs/01.1-safe-scripts/files
+cp "$SRC/site/current/important.txt" site/current/
 ./deploy.sh v3; echo "exit status: $?"
 ls site/current
 ```

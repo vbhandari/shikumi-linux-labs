@@ -28,8 +28,11 @@ cd ~/labs/12.1
 
 ```bash
 cat ~/shikumi-linux-labs/config/nginx/proxy.conf
-sudo install -m 0644 ~/shikumi-linux-labs/config/nginx/proxy.conf /etc/nginx/sites-available/shikumi
-sudo ln -sf /etc/nginx/sites-available/shikumi /etc/nginx/sites-enabled/shikumi
+sudo install -m 0644 \
+  ~/shikumi-linux-labs/config/nginx/proxy.conf \
+  /etc/nginx/sites-available/shikumi
+sudo ln -sf /etc/nginx/sites-available/shikumi \
+  /etc/nginx/sites-enabled/shikumi
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 ```

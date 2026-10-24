@@ -59,7 +59,8 @@ It still fails. ufw's default forward policy is DROP (`grep FORWARD /etc/default
 UPLINK=$(ip route show default | awk '{print $5; exit}')
 sudo ufw route allow in on veth-host out on "$UPLINK"
 sudo ip netns exec blue ping -c 3 1.1.1.1
-sudo ip netns exec blue curl -s -o /dev/null -w '%{http_code}\n' http://1.1.1.1/
+sudo ip netns exec blue \
+  curl -s -o /dev/null -w '%{http_code}\n' http://1.1.1.1/
 ```
 
 Use IP addresses here: blue has no DNS yet. Its `/etc/resolv.conf` is the host's, which points at systemd-resolved's stub on 127.0.0.53, and blue's 127.0.0.53 is its own empty loopback.

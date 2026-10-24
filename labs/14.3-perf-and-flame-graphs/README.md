@@ -38,16 +38,21 @@ VMs often hide hardware counters, so `cycles` shows `<not supported>`. The softw
 ### Step 2: Start the app and load its checksum endpoint.
 
 ```bash
-python3 ~/shikumi-linux-labs/app/shikumi_api.py --port 8500 & APP=$!
+python3 ~/shikumi-linux-labs/app/shikumi_api.py --port 8500 &
+APP=$!
 sleep 1
-python3 ~/shikumi-linux-labs/app/loadgen.py 'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 | tee slow.txt &
+python3 ~/shikumi-linux-labs/app/loadgen.py \
+  'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 | \
+  tee slow.txt &
 ```
 
 ### Step 3: Record 20 seconds of stacks.
 
 ```bash
-sudo perf record -e cpu-clock -F 99 -g -p $APP -o perf-plain.data -- sleep 20
-sudo perf report -i perf-plain.data --stdio --no-children 2>/dev/null | head -n 30
+sudo perf record -e cpu-clock -F 99 -g -p $APP \
+  -o perf-plain.data -- sleep 20
+sudo perf report -i perf-plain.data --stdio --no-children \
+  2>/dev/null | head -n 30
 ```
 
 Ubuntu builds with frame pointers, so `-g` works. You see the interpreter's C functions, such as `_PyEval_EvalFrameDefault`, but not which Python function is hot.
@@ -79,11 +84,17 @@ Copy `flame.svg` to the host and open it in a browser. Width is time on CPU. `su
 
 ```bash
 wait; kill $APP
-SHIKUMI_FAST_CHECKSUM=1 python3 -X perf ~/shikumi-linux-labs/app/shikumi_api.py --port 8500 & APP=$!
+SHIKUMI_FAST_CHECKSUM=1 python3 -X perf \
+  ~/shikumi-linux-labs/app/shikumi_api.py --port 8500 &
+APP=$!
 sleep 1
-python3 ~/shikumi-linux-labs/app/loadgen.py 'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 | tee fast.txt &
-sudo perf record -e cpu-clock -F 99 -g -p $APP -o perf-fast.data -- sleep 10
-sudo perf report -f -i perf-fast.data --stdio --no-children --sort sym 2>/dev/null > report-fast.txt
+python3 ~/shikumi-linux-labs/app/loadgen.py \
+  'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 | \
+  tee fast.txt &
+sudo perf record -e cpu-clock -F 99 -g -p $APP \
+  -o perf-fast.data -- sleep 10
+sudo perf report -f -i perf-fast.data --stdio --no-children \
+  --sort sym 2>/dev/null > report-fast.txt
 wait; kill $APP
 grep -E 'rps|p50' slow.txt fast.txt
 ```

@@ -50,8 +50,10 @@ Open a new SSH session from the host first. If it fails, wait 10 minutes: ufw tu
 ```bash
 systemctl list-units 'shikumi-*' --no-pager
 ps -eZ | grep shikumi-api
-systemd-analyze security shikumi-api@8001.service --no-pager | tail -n 1
-curl -s --cacert /etc/nginx/shikumi-tls/ca.crt https://localhost/healthz; echo
+systemd-analyze security shikumi-api@8001.service \
+  --no-pager | tail -n 1
+curl -s --cacert /etc/nginx/shikumi-tls/ca.crt \
+  https://localhost/healthz; echo
 sudo ufw status
 ~/shikumi-linux-labs/bin/shikumi-check lab 15.1
 ```

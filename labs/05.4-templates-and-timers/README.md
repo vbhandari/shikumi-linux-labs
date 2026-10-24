@@ -40,15 +40,19 @@ curl -s http://127.0.0.1:8001/healthz; echo; curl -s http://127.0.0.1:8002/healt
 ### Step 2: See how the template expands.
 
 ```bash
-systemctl cat shikumi-api@8001 --no-pager | grep -E 'ExecStart|^#'
+systemctl cat shikumi-api@8001 --no-pager | \
+  grep -E 'ExecStart|^#'
 systemctl show -p ExecStart shikumi-api@8002
 ```
 
 ### Step 3: Install the prune service and its timer.
 
 ```bash
-cat ~/shikumi-linux-labs/units/shikumi-prune.service ~/shikumi-linux-labs/units/shikumi-prune.timer
-sudo install -m 0644 ~/shikumi-linux-labs/units/shikumi-prune.{service,timer} /etc/systemd/system/
+cat ~/shikumi-linux-labs/units/shikumi-prune.service \
+  ~/shikumi-linux-labs/units/shikumi-prune.timer
+sudo install -m 0644 \
+  ~/shikumi-linux-labs/units/shikumi-prune.{service,timer} \
+  /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now shikumi-prune.timer
 systemctl list-timers shikumi-prune.timer --no-pager

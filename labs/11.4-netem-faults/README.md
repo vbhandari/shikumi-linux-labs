@@ -26,14 +26,17 @@ cd ~/labs/11.4
 ### Step 1: Measure a baseline from red.
 
 ```bash
-sudo ip netns exec red python3 ~/shikumi-linux-labs/app/loadgen.py http://10.200.0.1:8020/healthz \
+sudo ip netns exec red \
+  python3 ~/shikumi-linux-labs/app/loadgen.py \
+  http://10.200.0.1:8020/healthz \
   -c 5 -n 100 --timeout 1 --retries 2 | tee before.txt
 ```
 
 ### Step 2: Add delay and loss on blue's side of the link.
 
 ```bash
-sudo ip netns exec blue tc qdisc add dev veth-blue root netem delay 100ms loss 5%
+sudo ip netns exec blue \
+  tc qdisc add dev veth-blue root netem delay 100ms loss 5%
 sudo ip netns exec blue tc qdisc show dev veth-blue
 sudo ip netns exec red ping -c 5 10.200.0.1
 ```
@@ -43,7 +46,9 @@ netem acts on packets leaving `veth-blue`, so every round trip gains 100 ms. All
 ### Step 3: Measure again.
 
 ```bash
-sudo ip netns exec red python3 ~/shikumi-linux-labs/app/loadgen.py http://10.200.0.1:8020/healthz \
+sudo ip netns exec red \
+  python3 ~/shikumi-linux-labs/app/loadgen.py \
+  http://10.200.0.1:8020/healthz \
   -c 5 -n 100 --timeout 1 --retries 2 | tee netem.txt
 ```
 
@@ -52,10 +57,16 @@ p50 rises by about 100 ms. A lost SYN is resent after one second, longer than th
 ### Step 4: Watch the congestion window grow under delay.
 
 ```bash
-sudo ip netns exec blue tc qdisc change dev veth-blue root netem delay 100ms
+sudo ip netns exec blue \
+  tc qdisc change dev veth-blue root netem delay 100ms
 sudo ip netns exec blue iperf3 -s -1 -D
-sudo ip netns exec red iperf3 -c 10.200.0.1 -t 15 > iperf-delay.txt &
-for i in 1 2 3; do sleep 4; sudo ip netns exec red ss -tmi dst 10.200.0.1 | grep -o 'cwnd:[0-9]*\|rtt:[0-9.]*'; done
+sudo ip netns exec red \
+  iperf3 -c 10.200.0.1 -t 15 > iperf-delay.txt &
+for i in 1 2 3; do
+  sleep 4
+  sudo ip netns exec red ss -tmi dst 10.200.0.1 | \
+    grep -o 'cwnd:[0-9]*\|rtt:[0-9.]*'
+done
 wait; tail -n 4 iperf-delay.txt
 ```
 
@@ -64,9 +75,11 @@ With 100 ms RTT, throughput is limited by how much data may be in flight: the wi
 ### Step 5: Try other faults, then remove the qdisc.
 
 ```bash
-sudo ip netns exec blue tc qdisc change dev veth-blue root netem delay 50ms 20ms
+sudo ip netns exec blue \
+  tc qdisc change dev veth-blue root netem delay 50ms 20ms
 sudo ip netns exec red ping -c 5 10.200.0.1
-sudo ip netns exec blue tc qdisc change dev veth-blue root netem delay 10ms reorder 25% 50%
+sudo ip netns exec blue tc qdisc change dev veth-blue root \
+  netem delay 10ms reorder 25% 50%
 sudo ip netns exec blue tc qdisc del dev veth-blue root
 sudo ip netns exec blue tc qdisc show dev veth-blue
 ```

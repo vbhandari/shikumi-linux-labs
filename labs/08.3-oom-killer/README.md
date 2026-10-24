@@ -36,7 +36,8 @@ With overcommit mode 0 the kernel lets programs reserve more than it has, and se
 ### Step 2: Run alloc.py under a 100 MB limit.
 
 ```bash
-sudo systemd-run --scope --uid="$USER" -p MemoryMax=100M -p MemorySwapMax=0 --unit shikumi-oom \
+sudo systemd-run --scope --uid="$USER" \
+  -p MemoryMax=100M -p MemorySwapMax=0 --unit shikumi-oom \
   python3 ~/shikumi-linux-labs/app/alloc.py
 echo "exit=$?"
 ```

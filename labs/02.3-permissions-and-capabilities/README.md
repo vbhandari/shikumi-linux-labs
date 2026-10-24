@@ -44,7 +44,8 @@ The `s` in the group position is setgid: new files inherit group `deploy`.
 ### Step 3: Let shikumi read, now and for files created later.
 
 ```bash
-sudo setfacl -m u:shikumi:rx -m d:u:shikumi:rx -m d:g:deploy:rwx /srv/shikumi
+sudo setfacl -m u:shikumi:rx -m d:u:shikumi:rx \
+  -m d:g:deploy:rwx /srv/shikumi
 getfacl /srv/shikumi
 ```
 

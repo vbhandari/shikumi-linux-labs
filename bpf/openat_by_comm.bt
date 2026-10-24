@@ -1,5 +1,6 @@
 #!/usr/bin/env bpftrace
-// Count openat() calls per process name, printed every 5 seconds (Lab 14.4).
+// Count openat() calls per process name,
+// printed every 5 seconds (Lab 14.4).
 
 tracepoint:syscalls:sys_enter_openat
 {

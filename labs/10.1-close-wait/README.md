@@ -28,7 +28,9 @@ cd ~/labs/10.1
 ```bash
 python3 closewait.py & S=$!
 sleep 1
-for i in $(seq 1 20); do curl -s -m 2 http://127.0.0.1:8200/ >/dev/null; done
+for i in $(seq 1 20); do
+  curl -s -m 2 http://127.0.0.1:8200/ >/dev/null
+done
 ss -tan state close-wait '( sport = :8200 )' | tail -n 3
 ss -Htan state close-wait '( sport = :8200 )' | wc -l
 ls /proc/$S/fd | wc -l
@@ -55,7 +57,9 @@ Close the connection once the response is sent, in every case. Then start it aga
 
 ```bash
 python3 closewait.py &
-for i in $(seq 1 20); do curl -s -m 2 http://127.0.0.1:8200/ >/dev/null; done
+for i in $(seq 1 20); do
+  curl -s -m 2 http://127.0.0.1:8200/ >/dev/null
+done
 ss -Htan state close-wait '( sport = :8200 )' | wc -l
 ```
 

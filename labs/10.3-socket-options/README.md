@@ -27,11 +27,15 @@ cd ~/labs/10.3
 ### Step 1: Start two listeners on the same port.
 
 ```bash
-python3 ~/shikumi-linux-labs/app/shikumi_api.py --port 8400 --reuseport & A=$!
-python3 ~/shikumi-linux-labs/app/shikumi_api.py --port 8400 --reuseport & B=$!
+python3 ~/shikumi-linux-labs/app/shikumi_api.py \
+  --port 8400 --reuseport & A=$!
+python3 ~/shikumi-linux-labs/app/shikumi_api.py \
+  --port 8400 --reuseport & B=$!
 sleep 1
 ss -ltnp 'sport = :8400'
-python3 ~/shikumi-linux-labs/app/loadgen.py http://127.0.0.1:8400/healthz -c 20 -n 200 --by-pid | tee reuseport.txt
+python3 ~/shikumi-linux-labs/app/loadgen.py \
+  http://127.0.0.1:8400/healthz -c 20 -n 200 --by-pid | \
+  tee reuseport.txt
 ```
 
 The kernel spreads new connections across both sockets by a hash of the connection, so `by_pid` shows two PIDs with roughly equal counts.

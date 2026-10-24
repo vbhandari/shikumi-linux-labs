@@ -26,7 +26,8 @@ cd ~/labs/10.2
 ### Step 1: Read the system's limits.
 
 ```bash
-sysctl net.core.somaxconn net.ipv4.tcp_max_syn_backlog net.ipv4.tcp_syncookies
+sysctl net.core.somaxconn net.ipv4.tcp_max_syn_backlog \
+  net.ipv4.tcp_syncookies
 ```
 
 `listen(backlog)` is capped at `somaxconn`.
@@ -34,7 +35,8 @@ sysctl net.core.somaxconn net.ipv4.tcp_max_syn_backlog net.ipv4.tcp_syncookies
 ### Step 2: Start a listener with backlog 8 that never accepts.
 
 ```bash
-python3 ~/shikumi-linux-labs/app/acceptq.py --backlog 8 & A=$!
+python3 ~/shikumi-linux-labs/app/acceptq.py --backlog 8 &
+A=$!
 sleep 1
 ss -lnt 'sport = :8300'
 ```

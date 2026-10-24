@@ -29,8 +29,11 @@ cd ~/labs/5.1
 
 ```bash
 sudo install -d /opt/shikumi/bin /etc/shikumi
-sudo install -m 0755 ~/shikumi-linux-labs/app/shikumi_api.py /opt/shikumi/bin/shikumi-api
-sudo install -m 0644 ~/shikumi-linux-labs/units/shikumi-api.env /etc/shikumi/
+sudo install -m 0755 \
+  ~/shikumi-linux-labs/app/shikumi_api.py \
+  /opt/shikumi/bin/shikumi-api
+sudo install -m 0644 \
+  ~/shikumi-linux-labs/units/shikumi-api.env /etc/shikumi/
 ls -l /opt/shikumi/bin
 cat /etc/shikumi/shikumi-api.env
 ```

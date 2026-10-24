@@ -37,7 +37,10 @@ sudo ss -tlnp
 ### Step 2: Time a request.
 
 ```bash
-curl -s -o /dev/null -w 'connect %{time_connect}s  first byte %{time_starttransfer}s  total %{time_total}s\n' http://127.0.0.1:8001/healthz
+FMT='connect %{time_connect}s'
+FMT+='  first byte %{time_starttransfer}s'
+FMT+='  total %{time_total}s\n'
+curl -s -o /dev/null -w "$FMT" http://127.0.0.1:8001/healthz
 curl -v http://127.0.0.1:8001/healthz
 ```
 
