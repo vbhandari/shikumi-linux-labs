@@ -104,3 +104,22 @@ uplink() {
 http_status() {
   curl -s -o /dev/null -w '%{http_code}' --max-time 5 "$@"
 }
+
+# shikumi-unshare is a copy of unshare whose own AppArmor profile may create
+# user namespaces (Lab 13.1). Lab 13.3 reinstalls it if it is gone.
+ensure_shikumi_unshare() {
+  [[ -x /usr/local/bin/shikumi-unshare ]] || \
+    as_root install -m 0755 "$(command -v unshare)" /usr/local/bin/shikumi-unshare
+  if [[ -d /sys/kernel/security/apparmor ]] && command -v apparmor_parser >/dev/null; then
+    as_root install -m 0644 "$SHIKUMI_REPO/config/apparmor/shikumi-unshare" /etc/apparmor.d/shikumi-unshare
+    as_root apparmor_parser -r /etc/apparmor.d/shikumi-unshare
+  fi
+}
+
+remove_shikumi_unshare() {
+  if [[ -f /etc/apparmor.d/shikumi-unshare ]]; then
+    as_root apparmor_parser -R /etc/apparmor.d/shikumi-unshare 2>/dev/null
+    as_root rm -f /etc/apparmor.d/shikumi-unshare
+  fi
+  as_root rm -f /usr/local/bin/shikumi-unshare
+}

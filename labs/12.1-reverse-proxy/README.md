@@ -34,7 +34,7 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 ```
 
-Ubuntu reads `sites-enabled/`; the default site would also claim port 80.
+Ubuntu reads `sites-enabled/`; the default site would also claim port 80. The site file is always `/etc/nginx/sites-available/shikumi`: Lab 12.2 overwrites it with `tls.conf`.
 
 ### Step 2: Enable nginx again and open port 80.
 

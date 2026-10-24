@@ -6,7 +6,7 @@
 
 ## Before you start
 
-- Labs 13.1 and 13.2 done (keep `shikumi-unshare` for the stretch).
+- Labs 13.1 and 13.2 done. The stretch uses `shikumi-unshare` from Lab 13.1; `setup.sh` reinstalls it if a cleanup removed it.
 - Outbound HTTPS to dl-cdn.alpinelinux.org.
 
 ## Files in this folder
@@ -132,7 +132,7 @@ Run the same container without sudo: `./mini-container.sh --rootless rootfs`. In
 ~/shikumi-linux-labs/labs/13.3-mini-container/cleanup.sh
 ```
 
-Removes the veth, the `shikumi-ctr` cgroup (after killing anything in it) and the root filesystem. Then run the cleanup of Lab 13.1.
+Removes the veth, the `shikumi-ctr` cgroup (after killing anything in it), the root filesystem, and `shikumi-unshare` with its profile. Running the Lab 13.1 cleanup too is harmless.
 
 ## Coreutils used
 

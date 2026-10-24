@@ -1,5 +1,6 @@
 # logical-name   ubuntu                 fedora                         debian
 # "-" means not needed on that distro.
+# nginx is left out on purpose: Lab 4.1 installs it, and Lab 15.1's deploy.sh installs it on a clean VM.
 git              git                    git                            git
 curl             curl                   curl                           curl
 python3          python3                python3                        python3

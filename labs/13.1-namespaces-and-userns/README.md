@@ -115,7 +115,7 @@ Find every profile on the VM that grants `userns`: `sudo grep -l 'userns,' /etc/
 ~/shikumi-linux-labs/labs/13.1-namespaces-and-userns/cleanup.sh
 ```
 
-Run after Lab 13.3 (its stretch uses `shikumi-unshare`). Unloads the profile, removes both files, and fails loudly if the userns sysctl is no longer 1.
+Unloads the profile, removes both files, and fails loudly if the userns sysctl is no longer 1. Safe to run before Lab 13.3: its setup reinstalls `shikumi-unshare`.
 
 ## Coreutils used
 

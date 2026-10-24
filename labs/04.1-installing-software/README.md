@@ -7,6 +7,7 @@
 ## Before you start
 
 - Lab 3.3 done.
+- nginx not installed yet. The VM setup (`vm/provision.sh`, cloud-init) deliberately leaves it out; `setup.sh` warns if it is already there.
 
 ## Files in this folder
 
@@ -47,8 +48,11 @@ On Ubuntu and Debian, a package's service starts as soon as it is installed. ngi
 ```bash
 dpkg -S nginx.service
 dpkg -L nginx-common | grep -E '\.service$|nginx.conf$|logrotate'
+dpkg -L nginx | grep bin/
 ls -l /var/log/nginx
 ```
+
+nginx is split in two packages. `nginx` holds only the binary, `/usr/sbin/nginx`. `nginx-common` holds everything around it: `nginx.service`, `/etc/nginx`, the logrotate rule and `/var/log/nginx`. Removing `nginx` leaves the configuration; `apt purge nginx-common` removes it too. `nginx-core` is only a transitional package that pulls in `nginx`.
 
 ### Step 4: Hold a package, and look at automatic security updates.
 

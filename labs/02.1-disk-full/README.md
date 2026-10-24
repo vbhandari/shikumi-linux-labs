@@ -33,7 +33,7 @@ df -h /
 df -i /
 ```
 
-Lab data lives in `$HOME`, not `/tmp`: on Debian and Fedora `/tmp` is in RAM.
+Lab data lives in `$HOME`, not `/tmp`. On Ubuntu 26.04 `/tmp` is a tmpfs in RAM (systemd's `tmp.mount`, up to half of RAM, with a per-user quota); `/var/tmp` stays on disk. Check with `findmnt /tmp`.
 
 ### Step 2: Make a 200 MB filesystem in a file and mount it.
 
@@ -102,7 +102,7 @@ The hard link shares the inode and survives; the symlink now points at nothing.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
-> Same steps. Fedora mounts `/tmp` as tmpfs.
+> Same steps. Fedora also mounts `/tmp` as tmpfs.
 
 > **Debian**
 >

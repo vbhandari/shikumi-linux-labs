@@ -62,7 +62,21 @@ sudo ip netns exec blue ping -c 3 1.1.1.1
 sudo ip netns exec blue curl -s -o /dev/null -w '%{http_code}\n' http://1.1.1.1/
 ```
 
-### Step 5: Watch each hop.
+Use IP addresses here: blue has no DNS yet. Its `/etc/resolv.conf` is the host's, which points at systemd-resolved's stub on 127.0.0.53, and blue's 127.0.0.53 is its own empty loopback.
+
+### Step 5: Give blue its own resolver.
+
+```bash
+sudo ip netns exec blue getent hosts ubuntu.com || echo "no DNS in blue"
+sudo mkdir -p /etc/netns/blue
+echo "nameserver 1.1.1.1" | sudo tee /etc/netns/blue/resolv.conf
+sudo ip netns exec blue getent hosts ubuntu.com
+sudo ip netns exec blue curl -sI https://ubuntu.com | head -n 1
+```
+
+`ip netns exec` bind-mounts each file in `/etc/netns/blue/` over its `/etc` twin, for that command only.
+
+### Step 6: Watch each hop.
 
 ```bash
 sudo ip netns exec blue ping -c 20 -i 0.5 1.1.1.1 >/dev/null &
@@ -73,7 +87,7 @@ wait
 
 On `veth-host` the source is 10.200.1.2. On the uplink it is the VM's own address: masquerade rewrote it.
 
-### Step 6: Trace one packet through the rules.
+### Step 7: Trace one packet through the rules.
 
 ```bash
 sudo nft add table inet shikumi_trace
@@ -111,7 +125,7 @@ Remove the ufw route rule and use `nft monitor trace` to find exactly which chai
 ~/shikumi-linux-labs/labs/11.3-routing-and-nat/cleanup.sh
 ```
 
-Run after Lab 11.4. Deletes the NAT table, the ufw route rule, `veth-host` and any trace table, and restores `ip_forward`.
+Run after Lab 11.4. Deletes the NAT table, the ufw route rule, `veth-host`, any trace table and `/etc/netns/blue`, and restores `ip_forward`.
 
 ## Coreutils used
 

@@ -31,6 +31,8 @@ cd ~/labs/14.1
 sudo ./mystery.sh; date
 ```
 
+`setup.sh` copied `mystery.sh` from the lab's `files/` folder into `~/labs/14.1`. It takes `--reveal` and `--stop`, and runs the problem as the transient unit `shikumi-mystery`.
+
 ### Step 2: Take the first look.
 
 ```bash

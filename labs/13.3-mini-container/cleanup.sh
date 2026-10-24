@@ -12,5 +12,5 @@ if [[ -d "$cg" ]]; then
   as_root rmdir "$cg"
 fi
 as_root rm -rf "$LAB_HOME/13.3/rootfs"
-say "Next: run the cleanup of Lab 13.1."
+remove_shikumi_unshare
 say "Lab 13.3 cleanup done."

@@ -60,6 +60,8 @@ curl -s 'http://127.0.0.1:8600/files?n=3'; echo
 sudo pkill -f 'shikumi-api --port 8600'
 ```
 
+`/data?name=NAME` reads `NAME` from the data directory, `/var/lib/shikumi` unless `SHIKUMI_DATA_DIR` or `--data-dir` says otherwise; `setup.sh` put `hello.txt` there. Names that leave the directory get 400. Step 8 moves the data directory to `/srv/shikumi-data`, outside the profile.
+
 ### Step 5: Back in aa-genprof, press S to scan, then answer the prompts.
 
 - `/usr/bin/python3.14`: choose **(I)nherit**, so Python runs under the same profile (`ix`).

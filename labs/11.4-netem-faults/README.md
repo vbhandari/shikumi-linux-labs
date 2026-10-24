@@ -38,7 +38,7 @@ sudo ip netns exec blue tc qdisc show dev veth-blue
 sudo ip netns exec red ping -c 5 10.200.0.1
 ```
 
-netem acts on packets leaving `veth-blue`, so every round trip gains 100 ms.
+netem acts on packets leaving `veth-blue`, so every round trip gains 100 ms. All traffic in this lab stays between `red` and `blue`: the app listens on 10.200.0.1 only, and ufw, which filters the host's namespace, never sees it. No ufw rule is needed.
 
 ### Step 3: Measure again.
 

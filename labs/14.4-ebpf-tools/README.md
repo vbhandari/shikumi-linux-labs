@@ -50,7 +50,7 @@ wait; rm -f fio.dat
 
 ```bash
 sudo timeout 10 tcpconnect-bpfcc &
-sleep 2; for i in 1 2 3 4; do curl -sk -o /dev/null https://127.0.0.1/healthz; done
+sleep 2; for i in 1 2 3 4; do curl -s --cacert /etc/nginx/shikumi-tls/ca.crt -o /dev/null https://localhost/healthz; done
 wait
 ```
 

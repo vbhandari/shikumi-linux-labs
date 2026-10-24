@@ -35,9 +35,12 @@ openssl x509 -in server.crt -noout -subject -issuer -ext subjectAltName
 
 ```bash
 sudo install -d -m 0755 /etc/nginx/shikumi-tls
-sudo install -m 0644 server.crt /etc/nginx/shikumi-tls/
+sudo install -m 0644 server.crt ca.crt /etc/nginx/shikumi-tls/
 sudo install -m 0600 server.key /etc/nginx/shikumi-tls/
+ls -l /etc/nginx/shikumi-tls
 ```
+
+nginx reads `server.crt` and `server.key`. `ca.crt` goes alongside so later labs can verify against `/etc/nginx/shikumi-tls/ca.crt`, the same path `deploy.sh` uses in Lab 15.1. `ca.key` stays in `~/labs/12.2`.
 
 ### Step 3: Switch the site to TLS.
 

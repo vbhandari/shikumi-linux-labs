@@ -68,10 +68,10 @@ journalctl -b | less   # q to quit
 ```bash
 multipass stop shikumi && multipass snapshot shikumi --name clean && multipass start shikumi
 # or, with Vagrant:
-vagrant snapshot save clean
+vagrant snapshot save ubuntu clean
 ```
 
-Take another snapshot before M06, M11 and M13, so a broken lab is one restore away.
+Take more snapshots the same way before M06, M11 and M13, named `pre-m06`, `pre-m11` and `pre-m13`, so a broken lab is one restore away: `multipass restore shikumi.clean` or `vagrant snapshot restore ubuntu clean`. Lab 15.1 starts from `clean` and saves `stack`.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >

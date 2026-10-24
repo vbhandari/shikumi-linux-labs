@@ -22,3 +22,7 @@ if [[ ! -f "$W/rootfs/etc/alpine-release" ]]; then
   rm -f "$W/$tarball"
 fi
 say "Alpine $(cat "$W/rootfs/etc/alpine-release") is in $W/rootfs"
+if [[ ! -x /usr/local/bin/shikumi-unshare ]]; then
+  ensure_shikumi_unshare
+  say "Reinstalled shikumi-unshare from Lab 13.1, for the stretch"
+fi

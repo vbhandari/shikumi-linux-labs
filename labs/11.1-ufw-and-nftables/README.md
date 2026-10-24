@@ -42,7 +42,7 @@ Multipass and Vagrant both reach the VM over SSH on port 22. Open a **new** SSH 
 sudo systemctl stop shikumi-ufw-revert.timer
 ```
 
-If it does not, wait: ufw disables itself within 10 minutes.
+If it does not, wait: ufw disables itself within 10 minutes. `systemd-run --unit shikumi-ufw-revert` creates two transient units, `shikumi-ufw-revert.timer` and `shikumi-ufw-revert.service`; step 5 arms `shikumi-nft-revert` the same way.
 
 ### Step 2: Run the app on two ports, reachable from outside the VM.
 

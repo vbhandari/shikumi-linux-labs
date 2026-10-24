@@ -34,11 +34,13 @@ To get updates later: `git -C ~/shikumi-linux-labs pull`.
   - `setup.sh` is step 0. It copies the lab's files to `~/labs/<lab>` and checks prerequisites. Running it again restores the tested files.
   - `check.sh` verifies the result without changing anything, and exits 0 or 1. Run it as `bin/shikumi-check lab <lab>`, for example `bin/shikumi-check lab 5.1`.
   - `cleanup.sh` undoes the lab. It is safe to run twice, and it keeps what later labs build on; the README says when to run it.
+- A few labs have a script that runs from the repo rather than from `~/labs`: `labs/15.1-deploy-the-stack/deploy.sh` and `labs/15.2-incident-drills/break.sh`. Scripts the lab works on, such as `mystery.sh` in Lab 14.1, are in the lab's `files/` folder and `setup.sh` copies them.
 - Run the labs in order. Steps are for Ubuntu 26.04; grey **Fedora / RHEL-family** boxes and **Debian** notes show where other distributions differ.
 - Every resource the labs create is named `shikumi`. Sysctls change for the current boot only, and every cleanup restores them.
-- Take a VM snapshot before M06, M11 and M13, so a broken lab is one restore away.
+- Snapshots have fixed names: `clean` after Lab 0.1, `pre-m06`, `pre-m11` and `pre-m13` before those modules, and `stack` after Lab 15.1. A broken lab is one restore away.
 - Sudoers rules name exact commands, and no script matches or answers the sudo prompt.
 - Nothing in this repo is a real secret. Lab certificates and keys are generated on your VM.
+- The VM setup installs the course tools but not nginx: Lab 4.1 installs it. On Ubuntu 26.04 `/tmp` is a tmpfs in RAM, so lab data lives under `~/labs`.
 - `bin/shikumi-reset` removes everything the course installed, at the end.
 
 ## Lab index

@@ -29,7 +29,7 @@ cd ~/labs/15.1
 less ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/deploy.sh
 ```
 
-Each block repeats a lab you have done: 2.2, 5.1, 5.3, 5.4, 6.2, 11.1, 12.1 and 12.2. Every command is safe to run twice.
+Each block repeats a lab you have done: 2.2, 5.1, 5.3, 5.4, 6.2, 11.1, 12.1 and 12.2. Every command is safe to run twice. `deploy.sh` sits at the lab's root and runs from the repo; it is not copied to `~/labs`. It puts `ca.crt`, `server.crt` and `server.key` in `/etc/nginx/shikumi-tls/` and does not keep the CA key.
 
 ### Step 2: Run it.
 
@@ -65,6 +65,16 @@ sudo ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/deploy.sh
 
 Nothing breaks and nothing is duplicated: that is what idempotent means.
 
+### Step 6: On the host, snapshot the working stack.
+
+```bash
+multipass stop shikumi && multipass snapshot shikumi --name stack && multipass start shikumi
+# or, with Vagrant:
+vagrant snapshot save ubuntu stack
+```
+
+Lab 15.2 breaks this stack seven times. `break.sh --undo` repairs it; if a drill goes badly wrong, `multipass restore shikumi.stack` (or `vagrant snapshot restore ubuntu stack`) brings it back.
+
 > **Fedora / RHEL-family (alternate path, untested)**
 >
 > The Fedora equivalent keeps SELinux enforcing and uses firewalld: install the nginx config to `conf.d`, `setsebool -P httpd_can_network_connect 1`, and open `http` and `https` with `firewall-cmd --permanent`. `deploy.sh` covers Ubuntu only. *(to verify)*
@@ -90,7 +100,7 @@ Add a `--check` flag to `deploy.sh` that reports what it *would* change without 
 ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/cleanup.sh
 ```
 
-Nothing to undo: Lab 15.2 breaks this stack on purpose. To remove everything the course installed, run `~/shikumi-linux-labs/bin/shikumi-reset`, or restore the `clean` snapshot.
+Nothing to undo: Lab 15.2 breaks this stack on purpose. To remove everything the course installed, run `~/shikumi-linux-labs/bin/shikumi-reset`, or restore the `clean` snapshot. Keep the `stack` snapshot for Lab 15.2.
 
 ## Coreutils used
 

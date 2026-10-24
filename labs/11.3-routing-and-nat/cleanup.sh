@@ -10,5 +10,6 @@ as_root nft delete table inet shikumi_trace 2>/dev/null
 up="$(uplink)"
 command -v ufw >/dev/null && as_root ufw route delete allow in on veth-host out on "$up" >/dev/null 2>&1
 as_root ip link delete veth-host 2>/dev/null
+as_root rm -rf /etc/netns/blue
 [[ -f "$W/ip_forward.orig" ]] && as_root sysctl -q -w net.ipv4.ip_forward="$(cat "$W/ip_forward.orig")"
 say "Lab 11.3 cleanup done."

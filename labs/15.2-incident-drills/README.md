@@ -6,8 +6,7 @@
 
 ## Before you start
 
-- Lab 15.1 done and its check passing.
-- Take a VM snapshot first.
+- Lab 15.1 done and its check passing, with the `stack` snapshot taken.
 
 ## Files in this folder
 
@@ -36,7 +35,7 @@ cd ~/labs/15.2
 sudo ~/shikumi-linux-labs/labs/15.2-incident-drills/break.sh 1
 ```
 
-Do not read `break.sh` until you have fixed the fault: the point is to find it from symptoms. Start from what a user would see:
+`break.sh` sits at the lab's root and runs from the repo; it is not copied to `~/labs`. It takes a drill number, 1 to 7, or `--undo`. After each fix, `shikumi-check lab 15.2` runs this lab's `check.sh` against the whole stack. Do not read `break.sh` until you have fixed the fault: the point is to find it from symptoms. Start from what a user would see:
 
 ```bash
 curl -s --cacert /etc/nginx/shikumi-tls/ca.crt https://localhost/healthz
