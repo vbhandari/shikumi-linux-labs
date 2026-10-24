@@ -1,0 +1,126 @@
+# Lab 11.3: Route and NAT out of a namespace
+
+**Module M11 · Firewalls, network namespaces and fault injection** · about 25 min · [Lab index](../../README.md#lab-index)
+
+**Goal:** Give `blue` a way out to the internet through the host: a second veth pair, IP forwarding for this boot, a masquerade rule, and a ufw route rule.
+
+## Before you start
+
+- Lab 11.2 done, with `blue` still in place.
+
+## Files in this folder
+
+- [`setup.sh`](setup.sh), [`check.sh`](check.sh), [`cleanup.sh`](cleanup.sh)
+
+## Steps
+
+Steps are for Ubuntu 26.04 LTS.
+
+### Step 0: Copy the lab files.
+
+```bash
+~/shikumi-linux-labs/labs/11.3-routing-and-nat/setup.sh
+cd ~/labs/11.3
+```
+
+### Step 1: Turn on forwarding for this boot only.
+
+```bash
+sysctl -n net.ipv4.ip_forward > ip_forward.orig
+sudo sysctl -w net.ipv4.ip_forward=1
+```
+
+### Step 2: Connect blue to the host.
+
+```bash
+sudo ip link add veth-host type veth peer name veth-blue-up
+sudo ip link set veth-blue-up netns blue
+sudo ip addr add 10.200.1.1/24 dev veth-host
+sudo ip link set veth-host up
+sudo ip -n blue addr add 10.200.1.2/24 dev veth-blue-up
+sudo ip -n blue link set veth-blue-up up
+sudo ip -n blue route add default via 10.200.1.1
+sudo ip netns exec blue ping -c 2 10.200.1.1
+```
+
+### Step 3: Add masquerade, and try to get out.
+
+```bash
+cat ~/shikumi-linux-labs/config/nftables/nat.nft
+sudo nft -f ~/shikumi-linux-labs/config/nftables/nat.nft
+sudo ip netns exec blue ping -c 2 -W 2 1.1.1.1
+```
+
+It still fails. ufw's default forward policy is DROP (`grep FORWARD /etc/default/ufw`), so the host refuses to route blue's packets.
+
+### Step 4: Allow forwarding from blue to the uplink only.
+
+```bash
+UPLINK=$(ip route show default | awk '{print $5; exit}')
+sudo ufw route allow in on veth-host out on "$UPLINK"
+sudo ip netns exec blue ping -c 3 1.1.1.1
+sudo ip netns exec blue curl -s -o /dev/null -w '%{http_code}\n' http://1.1.1.1/
+```
+
+### Step 5: Watch each hop.
+
+```bash
+sudo ip netns exec blue ping -c 20 -i 0.5 1.1.1.1 >/dev/null &
+sudo tcpdump -ni veth-host -c 2 icmp
+sudo tcpdump -ni "$UPLINK" -c 2 icmp
+wait
+```
+
+On `veth-host` the source is 10.200.1.2. On the uplink it is the VM's own address: masquerade rewrote it.
+
+### Step 6: Trace one packet through the rules.
+
+```bash
+sudo nft add table inet shikumi_trace
+sudo nft 'add chain inet shikumi_trace pre { type filter hook prerouting priority -350; }'
+sudo nft add rule inet shikumi_trace pre ip saddr 10.200.1.2 icmp type echo-request meta nftrace set 1
+sudo ip netns exec blue ping -c 1 1.1.1.1 >/dev/null &
+sudo timeout 3 nft monitor trace | head -n 20
+sudo nft delete table inet shikumi_trace
+```
+
+> **Fedora / RHEL-family (alternate path, untested)**
+>
+> Put `veth-host` in firewalld's `trusted` zone and enable masquerade on the uplink's zone; skip the nft and ufw steps. See `config/firewalld/README.md`. *(to verify)*
+
+> **Debian**
+>
+> Without ufw there is no forward DROP policy, so step 4 is not needed.
+
+## Checks (expected output)
+
+```bash
+~/shikumi-linux-labs/bin/shikumi-check lab 11.3
+```
+
+- `blue` can ping 1.1.1.1
+- The `ip shikumi_nat` table and the ufw route rule are in place
+
+## Stretch challenge
+
+Remove the ufw route rule and use `nft monitor trace` to find exactly which chain drops the packet.
+
+## Cleanup
+
+```bash
+~/shikumi-linux-labs/labs/11.3-routing-and-nat/cleanup.sh
+```
+
+Run after Lab 11.4. Deletes the NAT table, the ufw route rule, `veth-host` and any trace table, and restores `ip_forward`.
+
+## Coreutils used
+
+`cat`, `head`, `timeout`. On Ubuntu 26.04 these come from uutils; if one behaves differently, run its GNU build as `gnu<cmd>` (for example `gnustat`).
+
+## Tested
+
+Not yet run on an Ubuntu 26.04 VM.
+
+---
+
+© 2026 Vinay Bhandari and Shikumi Labs. All rights reserved.

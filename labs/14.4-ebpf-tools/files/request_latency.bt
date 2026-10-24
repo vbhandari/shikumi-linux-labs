@@ -1,0 +1,20 @@
+#!/usr/bin/env bpftrace
+// shikumi-api serves one request per connection, so the time from accept()
+// to close() of the same socket is the request latency.
+
+tracepoint:syscalls:sys_exit_accept4
+/comm == "shikumi-api" && args.ret >= 0/
+{
+  // TODO: remember the time, keyed by process and the new file descriptor (args.ret)
+}
+
+tracepoint:syscalls:sys_enter_close
+/@start[pid, args.fd]/
+{
+  // TODO: add the elapsed time in ms to a histogram @request_ms, then forget the start time
+}
+
+END
+{
+  clear(@start);
+}

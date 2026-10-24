@@ -1,0 +1,2 @@
+# Members of deploy may restart the app, and nothing else.
+%deploy ALL=(root) /usr/bin/systemctl restart shikumi-api.service

@@ -1,0 +1,6 @@
+# Fill in each value after the = sign.
+total_requests=
+server_errors=
+top_path=
+top_ip=
+slowest_path=
