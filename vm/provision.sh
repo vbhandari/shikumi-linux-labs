@@ -35,7 +35,7 @@ else
   fi
 fi
 
-# netem (Labs 11.4 and 15.2) lives in an extra modules package on some kernels.
+# netem (network fault injection) lives in an extra modules package on some kernels.
 if ! modprobe -q sch_netem; then
   case $FAMILY in
     ubuntu) apt-get install -y "linux-modules-extra-$(uname -r)" || true ;;
