@@ -9,4 +9,5 @@ if [[ -f /etc/systemd/system/shikumi-api@.service.d/cache.conf ]]; then
   as_root systemctl daemon-reload
   as_root systemctl try-restart shikumi-api@8001 shikumi-api@8002
 fi
+rm -rf "$LAB_HOME/6.2"
 say "Lab 6.2 cleanup done."

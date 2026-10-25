@@ -105,7 +105,7 @@ cd ~
 ~/shikumi-linux-labs/labs/12.1-reverse-proxy/cleanup.sh
 ```
 
-Nothing to undo: Lab 12.2 builds on this. The script is a no-op.
+Removes `~/labs/12.1` and nothing else: Lab 12.2 builds on this.
 
 ## Coreutils used
 

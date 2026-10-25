@@ -124,7 +124,7 @@ cd ~
 ~/shikumi-linux-labs/labs/11.1-ufw-and-nftables/cleanup.sh
 ```
 
-Deletes the `shikumi` table, the two port rules and both undo timers, and stops the two apps. ufw stays enabled with OpenSSH allowed.
+Deletes the `shikumi` table, the two port rules and both undo timers, and stops the two apps. ufw stays enabled with OpenSSH allowed. The script also removes `~/labs/11.1`.
 
 ## Coreutils used
 

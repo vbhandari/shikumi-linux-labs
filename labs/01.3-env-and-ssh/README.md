@@ -69,14 +69,14 @@ vagrant ssh -- -N -L 8080:127.0.0.1:8080
 ### Step 5: Copy a file from the VM to the host with rsync.
 
 ```bash
-# inside the VM:
+# in a second VM shell (the app still holds the first):
 echo "made on $(hostname)" > ~/labs/1.3/from-vm.txt
-# on the host:
+# in a host terminal (not the tunnel's):
 rsync -av USER@VM_IP:labs/1.3/from-vm.txt .
 scp USER@VM_IP:labs/1.3/from-vm.txt .   # same, without rsync
 ```
 
-rsync must be installed on both ends. `provision.sh` installs it in the VM; if the host has none (Windows, some minimal installs), use the `scp` line. With Vagrant, `vagrant ssh-config` shows the user, address, port and key to use.
+The app you started in the foreground still holds your first VM shell and the tunnel holds a host terminal, so open a new SSH session for the first line (`multipass shell shikumi`, `vagrant ssh` or `ssh USER@VM_IP`) and a new host terminal for the rest. rsync must be installed on both ends. `provision.sh` installs it in the VM; if the host has none (Windows, some minimal installs), use the `scp` line. With Vagrant, `vagrant ssh-config` shows the user, address, port and key to use.
 
 ## Checks (expected output)
 

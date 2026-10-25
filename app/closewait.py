@@ -8,7 +8,8 @@ FIXED = "--fixed" in sys.argv
 held = []
 
 srv = socket.create_server(("127.0.0.1", 8200))
-print("closewait listening on 127.0.0.1:8200", "(fixed)" if FIXED else "(buggy)", flush=True)
+tag = " (reference fix)" if FIXED else ""
+print("closewait listening on 127.0.0.1:8200" + tag, flush=True)
 while True:
     conn, _ = srv.accept()
     conn.recv(1024)

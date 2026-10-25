@@ -10,4 +10,5 @@ if [[ -f /etc/systemd/system/shikumi-api.service.d/data-dir.conf ]]; then
   as_root systemctl try-restart shikumi-api
 fi
 as_root rm -rf /srv/shikumi-data
+rm -rf "$LAB_HOME/6.1"
 say "Lab 6.1 cleanup done."

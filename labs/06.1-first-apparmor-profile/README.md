@@ -7,7 +7,8 @@
 ## Before you start
 
 - Lab 5.4 done.
-- Take a VM snapshot first (`multipass snapshot` or `vagrant snapshot save`).
+- Take a VM snapshot first (`multipass snapshot`, `vagrant snapshot save`, or your cloud provider's console).
+- Paste one block at a time. After `sudo systemctl start` or `aa-complain`, wait for the prompt before you paste more: lines typed ahead while they run can be lost.
 
 ## Files in this folder
 
@@ -52,33 +53,52 @@ It puts an empty profile in complain mode and waits. Leave it at its prompt.
 ### Step 4: In a second terminal, start the service and exercise it.
 
 ```bash
-sudo systemctl start shikumi-api
+sudo systemctl start --no-block shikumi-api
+sleep 1
 curl -s http://127.0.0.1:8000/healthz; echo
 curl -s 'http://127.0.0.1:8000/data?name=hello.txt'; echo
 curl -s 'http://127.0.0.1:8000/files?n=3'; echo
 sudo systemctl stop shikumi-api
 ```
 
-Run it as the real service, so the profile sees everything the service does, including the `READY=1` message it sends to systemd's notify socket (Lab 5.1). `/data?name=NAME` reads `NAME` from the data directory, `/var/lib/shikumi` unless `SHIKUMI_DATA_DIR` or `--data-dir` says otherwise; `setup.sh` put `hello.txt` there. Names that leave the directory get 400. Step 8 moves the data directory to `/srv/shikumi-data`, outside the profile.
+Run it as the real service, so the profile sees what the service does. `--no-block` returns at once: under the new, empty profile the service cannot send its `READY=1` message yet (step 6 explains why), so a plain `start` would hang for 15 seconds and fail. The app is listening anyway, so the requests work. `/data?name=NAME` reads `NAME` from the data directory, `/var/lib/shikumi` unless `SHIKUMI_DATA_DIR` or `--data-dir` says otherwise; `setup.sh` put `hello.txt` there. Names that leave the directory get 400. Step 8 moves the data directory to `/srv/shikumi-data`, outside the profile.
 
 ### Step 5: Back in aa-genprof, press S to scan, then answer the prompts.
 
-- `/usr/bin/python3.14`: choose **(I)nherit**, so Python runs under the same profile (`ix`).
-- Read access to `/opt/shikumi/bin/shikumi-api`: **(A)llow**.
-- Abstractions such as `python` and `nameservice`: allow them.
-- `/var/lib/shikumi/hello.txt`: choose **(G)lob** until it reads `/var/lib/shikumi/*`, then allow.
-- Network `inet stream`: allow.
-- Write access to `/run/systemd/notify` (or a `unix` rule for it): **(A)llow**. That is the `READY=1` message; without it, `systemctl start` waits 15 seconds and fails.
+- `owner /var/lib/shikumi/hello.txt r`: choose **(G)lob** until it reads `/var/lib/shikumi/*`, then **(A)llow**.
+- `/opt/shikumi/bin/ r`, the app's own directory: **(A)llow**.
+- Network: aa-genprof offers abstractions, with `abstractions/apache2-common` as the default, plus `nameservice` and `passt`, and a specific `network inet stream` rule. Pick the specific rule; the default works but allows much more than the app needs.
+
+There is no prompt for Python: aa-genprof adds `/usr/bin/python3.14 ix` (inherit) by itself. There is no prompt for the notify socket either; step 6 explains why.
 
 Press **S** to save and **F** to finish. The profile is now in enforce mode in `/etc/apparmor.d/opt.shikumi.bin.shikumi-api`. If the session went wrong, install the reference profile instead (next step).
 
-### Step 6: Compare with the reference profile, or use it.
+### Step 6: Compare with the reference profile, and add what aa-genprof cannot see.
 
 ```bash
-diff ~/shikumi-linux-labs/config/apparmor/opt.shikumi.bin.shikumi-api /etc/apparmor.d/opt.shikumi.bin.shikumi-api
-# only if your profile does not work:
-sudo install -m 0644 ~/shikumi-linux-labs/config/apparmor/opt.shikumi.bin.shikumi-api /etc/apparmor.d/
-sudo apparmor_parser -r /etc/apparmor.d/opt.shikumi.bin.shikumi-api
+R=~/shikumi-linux-labs/config/apparmor
+P=/etc/apparmor.d/opt.shikumi.bin.shikumi-api
+sudo diff "$R/opt.shikumi.bin.shikumi-api" "$P"
+sudo ${EDITOR:-nano} "$P"
+sudo apparmor_parser -r "$P"
+```
+
+The generated file is readable only by root, hence `sudo diff`. In the editor, make two changes that aa-genprof cannot suggest:
+
+1. Change the line that opens the profile, `/opt/shikumi/bin/shikumi-api {`, to `/opt/shikumi/bin/shikumi-api flags=(attach_disconnected) {`. systemd's sandbox (Lab 5.3) gives the service its own mount view, so `/run/systemd/notify` and `/dev/null` lie outside it. AppArmor cannot name such "disconnected" paths and refuses them, even in complain mode, so the log never offers a rule.
+2. Add these two rules inside the braces, so the service may send `READY=1` to systemd's socket:
+
+```
+  @{run}/systemd/notify w,
+  unix (connect, send) type=dgram peer=(label=unconfined),
+```
+
+Instead of editing, you can install the reference profile, which has all of this:
+
+```bash
+sudo install -m 0644 "$R/opt.shikumi.bin.shikumi-api" \
+  /etc/apparmor.d/
+sudo apparmor_parser -r "$P"
 ```
 
 ### Step 7: Start the service and confirm it runs confined.
@@ -89,7 +109,7 @@ ps -eZ | grep shikumi-api
 curl -s 'http://127.0.0.1:8000/data?name=hello.txt'; echo
 ```
 
-If `systemctl start` waits and then fails with a timeout, the profile is blocking the `READY=1` message: `sudo journalctl -k -g 'apparmor="DENIED"' -n 3` names `/run/systemd/notify`. Install the reference profile (step 6), which allows it, and start the service again.
+If `systemctl start` waits 15 seconds and fails with a timeout, the profile is blocking the `READY=1` message. `sudo journalctl -k -g 'apparmor="DENIED"' -n 3` names `/run/systemd/notify`, or says `disconnected path` if the `flags=` line is missing. Fix the profile as in step 6. Until then, systemd retries about every 16 seconds (the 15-second timeout plus `RestartSec=1`). That is too slow to reach the start limit, so it keeps going until you run `sudo systemctl stop shikumi-api`.
 
 ### Step 8: Ask for a file the profile does not allow.
 
@@ -140,7 +160,7 @@ sudo systemctl start shikumi-api@8001 shikumi-api@8002
 
 - The `/opt/shikumi/bin/shikumi-api` profile is loaded in enforce mode
 - `shikumi-api.service` runs confined by it and `/data` returns 200
-- The kernel log holds an `apparmor="DENIED"` line for the profile (from step 8)
+- The kernel log holds the step 8 `apparmor="DENIED"` line: the profile refusing `/srv/shikumi-data/hello.txt`
 - The `data-dir.conf` drop-in is gone
 
 ## Stretch challenge
@@ -154,7 +174,7 @@ cd ~
 ~/shikumi-linux-labs/labs/06.1-first-apparmor-profile/cleanup.sh
 ```
 
-Removes the `data-dir.conf` drop-in and `/srv/shikumi-data`. The profile stays loaded for Lab 6.2.
+Removes the `data-dir.conf` drop-in, `/srv/shikumi-data` and `~/labs/6.1`. The profile stays loaded for Lab 6.2.
 
 ## Coreutils used
 

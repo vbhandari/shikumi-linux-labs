@@ -47,13 +47,15 @@ For a listening socket, `Send-Q` is the queue limit (8) and `Recv-Q` the connect
 
 ```bash
 nstat -az TcpExtListenOverflows TcpExtListenDrops
-python3 ~/shikumi-linux-labs/app/loadgen.py http://127.0.0.1:8300/ -c 50 -n 50 --timeout 3 | tee backlog8.txt &
+python3 ~/shikumi-linux-labs/app/loadgen.py \
+  http://127.0.0.1:8300/ -c 50 -n 50 --timeout 3 | \
+  tee backlog8.txt & L=$!
 sleep 1; ss -lnt 'sport = :8300'
-wait
+wait $L
 nstat -az TcpExtListenOverflows TcpExtListenDrops
 ```
 
-`Recv-Q` stops at 9 (backlog + 1). The kernel drops further handshakes and counts them in `ListenOverflows`; clients retry their SYN, then time out.
+`Recv-Q` stops at 9 (backlog + 1). The kernel drops further handshakes and counts them in `ListenOverflows`; clients retry their SYN, then time out. `wait $L` waits for the load generator only; a bare `wait` would also wait for `acceptq.py`, which never exits.
 
 ### Step 4: Raise the backlog and repeat.
 
@@ -61,9 +63,11 @@ nstat -az TcpExtListenOverflows TcpExtListenDrops
 kill $A
 python3 ~/shikumi-linux-labs/app/acceptq.py --backlog 64 & A=$!
 sleep 1
-python3 ~/shikumi-linux-labs/app/loadgen.py http://127.0.0.1:8300/ -c 50 -n 50 --timeout 3 | tee backlog64.txt &
+python3 ~/shikumi-linux-labs/app/loadgen.py \
+  http://127.0.0.1:8300/ -c 50 -n 50 --timeout 3 | \
+  tee backlog64.txt & L=$!
 sleep 1; ss -lnt 'sport = :8300'
-wait; kill $A
+wait $L; kill $A
 nstat -az TcpExtListenOverflows
 ```
 

@@ -11,4 +11,5 @@ if command -v ufw >/dev/null; then
   as_root ufw delete allow 8011/tcp >/dev/null 2>&1
 fi
 pkill -u "$USER" -f 'shikumi_api.py --host 0.0.0.0 --port 801[01]' 2>/dev/null
+rm -rf "$LAB_HOME/11.1"
 say "Lab 11.1 cleanup done."

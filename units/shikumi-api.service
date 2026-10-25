@@ -1,10 +1,10 @@
 [Unit]
 Description=shikumi-api sample service (Shikumi Labs)
 After=network.target
-# Default: 5 starts in 10 s. Labs 5.1 and 5.3 pasted back to
-# back start it 12 times in about 25 s, so allow 20 in 60 s.
-# A crash loop (RestartSec=1, about 1.1 s per start) still
-# trips it after about 22 s.
+# Default: 5 starts in 10 s. Restarting it by hand several
+# times in a row can start it 12 times in about 25 s, so
+# allow 20 in 60 s. A crash loop (RestartSec=1, about 1.1 s
+# per start) still trips it after about 22 s.
 StartLimitIntervalSec=60s
 StartLimitBurst=20
 
@@ -13,6 +13,10 @@ StartLimitBurst=20
 # so systemctl start returns only when it can take requests.
 Type=notify
 TimeoutStartSec=15s
+# A start that times out is retried as well, about every 16 s
+# (timeout + RestartSec). That never trips the start limit,
+# on purpose: a service that cannot report ready yet keeps
+# trying until it can, or until you stop it.
 User=shikumi
 Group=shikumi
 EnvironmentFile=-/etc/shikumi/shikumi-api.env

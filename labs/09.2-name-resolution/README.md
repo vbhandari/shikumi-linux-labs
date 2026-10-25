@@ -57,10 +57,10 @@ resolvectl query api.shikumi.test
 getent hosts example.com
 dig example.com +noall +answer
 dig @1.1.1.1 example.com +noall +answer
-resolvectl statistics --no-pager | head -n 12
+sudo resolvectl statistics --no-pager | head -n 12
 ```
 
-The TTL from the stub counts down between runs: resolved caches answers.
+The TTL from the stub counts down between runs: resolved caches answers. `resolvectl statistics` needs `sudo` on Ubuntu 26.04.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
@@ -90,7 +90,7 @@ cd ~
 ~/shikumi-linux-labs/labs/09.2-name-resolution/cleanup.sh
 ```
 
-Removes the `# shikumi-lab` line from `/etc/hosts`.
+Removes the `# shikumi-lab` line from `/etc/hosts`, flushes systemd-resolved's cache so `api.shikumi.test` is gone at once (otherwise resolved can keep serving it for a few seconds), and removes `~/labs/9.2`.
 
 ## Coreutils used
 

@@ -12,4 +12,5 @@ command -v ufw >/dev/null && as_root ufw route delete allow in on veth-host out 
 as_root ip link delete veth-host 2>/dev/null
 as_root rm -rf /etc/netns/blue
 [[ -f "$W/ip_forward.orig" ]] && as_root sysctl -q -w net.ipv4.ip_forward="$(cat "$W/ip_forward.orig")"
+rm -rf "$LAB_HOME/11.3"
 say "Lab 11.3 cleanup done."

@@ -100,7 +100,7 @@ cd ~
 ~/shikumi-linux-labs/labs/13.4-what-container-tools-add/cleanup.sh
 ```
 
-Removes the container and the image.
+Removes the container and the image. The script also removes `~/labs/13.4`.
 
 ## Coreutils used
 

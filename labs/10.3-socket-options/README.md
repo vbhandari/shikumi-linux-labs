@@ -28,9 +28,9 @@ cd ~/labs/10.3
 
 ```bash
 python3 ~/shikumi-linux-labs/app/shikumi_api.py \
-  --port 8400 --reuseport & A=$!
+  --port 8400 --reuseport >/dev/null & A=$!
 python3 ~/shikumi-linux-labs/app/shikumi_api.py \
-  --port 8400 --reuseport & B=$!
+  --port 8400 --reuseport >/dev/null & B=$!
 sleep 1
 ss -ltnp 'sport = :8400'
 python3 ~/shikumi-linux-labs/app/loadgen.py \
@@ -38,7 +38,7 @@ python3 ~/shikumi-linux-labs/app/loadgen.py \
   tee reuseport.txt
 ```
 
-The kernel spreads new connections across both sockets by a hash of the connection, so `by_pid` shows two PIDs with roughly equal counts.
+The kernel spreads new connections across both sockets by a hash of the connection, so `by_pid` shows two PIDs with roughly equal counts. `>/dev/null` keeps the two servers' access lines (`GET /healthz 200`) from burying the result; errors still show.
 
 ### Step 2: See the options being set.
 

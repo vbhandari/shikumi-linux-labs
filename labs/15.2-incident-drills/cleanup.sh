@@ -5,4 +5,5 @@ set -uo pipefail
 . "$(dirname "$(readlink -f "$0")")/../../bin/lib.sh"
 
 as_root "$(lab_dir 15.2)/break.sh" --undo
+rm -rf "$LAB_HOME/15.2"
 say "Lab 15.2 cleanup done."

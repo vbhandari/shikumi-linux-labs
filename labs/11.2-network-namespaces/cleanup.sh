@@ -6,4 +6,5 @@ set -uo pipefail
 
 pkill -u "$USER" -f 'shikumi_api.py --host 10.200.0.1' 2>/dev/null
 for ns in blue red; do as_root ip netns delete "$ns" 2>/dev/null; done
+rm -rf "$LAB_HOME/11.2"
 say "Lab 11.2 cleanup done."

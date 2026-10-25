@@ -61,13 +61,13 @@ sudo ip netns exec blue \
   tc qdisc change dev veth-blue root netem delay 100ms
 sudo ip netns exec blue iperf3 -s -1 -D
 sudo ip netns exec red \
-  iperf3 -c 10.200.0.1 -t 15 > iperf-delay.txt &
+  iperf3 -c 10.200.0.1 -t 15 > iperf-delay.txt & I=$!
 for i in 1 2 3; do
   sleep 4
   sudo ip netns exec red ss -tmi dst 10.200.0.1 | \
     grep -o 'cwnd:[0-9]*\|rtt:[0-9.]*'
 done
-wait; tail -n 4 iperf-delay.txt
+wait $I; tail -n 4 iperf-delay.txt
 ```
 
 With 100 ms RTT, throughput is limited by how much data may be in flight: the window and the buffers from Lab 10.4.
@@ -108,7 +108,7 @@ cd ~
 ~/shikumi-linux-labs/labs/11.4-netem-faults/cleanup.sh
 ```
 
-Removes any netem qdisc and stops iperf3. Then run the cleanups of Labs 11.3 and 11.2, in that order.
+Removes any netem qdisc and stops iperf3. Then run the cleanups of Labs 11.3 and 11.2, in that order. The script also removes `~/labs/11.4`.
 
 ## Coreutils used
 

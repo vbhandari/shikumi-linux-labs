@@ -97,7 +97,7 @@ cd ~
 ~/shikumi-linux-labs/labs/05.2-the-journal/cleanup.sh
 ```
 
-Nothing to undo.
+Removes `~/labs/5.2`; nothing else to undo.
 
 ## Coreutils used
 

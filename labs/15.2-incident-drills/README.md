@@ -81,7 +81,7 @@ cd ~
 ~/shikumi-linux-labs/labs/15.2-incident-drills/cleanup.sh
 ```
 
-Undoes every drill (`break.sh --undo`). The Lab 15.1 stack stays. To remove everything, run `~/shikumi-linux-labs/bin/shikumi-reset` or restore the `clean` snapshot.
+Undoes every drill (`break.sh --undo`). The Lab 15.1 stack stays. To remove everything, run `~/shikumi-linux-labs/bin/shikumi-reset` or restore the `clean` snapshot. The script also removes `~/labs/15.2`.
 
 ## Coreutils used
 

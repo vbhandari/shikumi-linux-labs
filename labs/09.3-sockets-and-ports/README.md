@@ -47,9 +47,11 @@ curl -v http://127.0.0.1:8001/healthz
 ### Step 3: Capture one request on loopback.
 
 ```bash
-sudo timeout 10 tcpdump -i lo -nn -l port 8001 | tee capture.txt & sleep 2
+sudo timeout 10 tcpdump -i lo -nn -l port 8001 | \
+  tee capture.txt & T=$!
+sleep 2
 curl -s http://127.0.0.1:8001/healthz; echo
-wait
+wait $T
 ```
 
 `-l` makes tcpdump flush each line, so `tee` writes it straight away. The course avoids `-w file.pcap` here because Ubuntu's AppArmor profile for tcpdump limits where it may write.

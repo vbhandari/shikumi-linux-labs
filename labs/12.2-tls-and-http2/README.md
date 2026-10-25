@@ -107,7 +107,7 @@ cd ~
 ~/shikumi-linux-labs/labs/12.2-tls-and-http2/cleanup.sh
 ```
 
-Nothing to undo: the TLS site stays in place. Lab 15.1 rebuilds it from a clean snapshot.
+Nothing to undo: the TLS site stays in place, and so does `~/labs/12.2`, which holds the lab CA's `ca.key`. Lab 15.1 rebuilds the site from a clean snapshot.
 
 ## Coreutils used
 

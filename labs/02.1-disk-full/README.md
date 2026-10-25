@@ -129,7 +129,7 @@ cd ~
 ~/shikumi-linux-labs/labs/02.1-disk-full/cleanup.sh
 ```
 
-Stops holdlog.py, unmounts `/mnt/shikumi` and deletes the image.
+Stops holdlog.py, unmounts `/mnt/shikumi` and deletes the image. The script also removes `~/labs/2.1`.
 
 ## Coreutils used
 

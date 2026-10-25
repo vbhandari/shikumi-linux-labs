@@ -86,7 +86,7 @@ cd ~
 ~/shikumi-linux-labs/labs/13.2-cgroups-v2/cleanup.sh
 ```
 
-Kills anything left in the `shikumi` group, removes it, and stops `shikumi-burn`.
+Kills anything left in the `shikumi` group, removes it, and stops `shikumi-burn`. The script also removes `~/labs/13.2`.
 
 ## Coreutils used
 

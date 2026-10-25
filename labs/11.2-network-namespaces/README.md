@@ -89,7 +89,7 @@ cd ~
 ~/shikumi-linux-labs/labs/11.2-network-namespaces/cleanup.sh
 ```
 
-Run this cleanup only after Labs 11.3 and 11.4, which use the namespaces. It stops the app in `blue` and deletes both namespaces, which removes the veth pair too.
+Run this cleanup only after Labs 11.3 and 11.4, which use the namespaces. It stops the app in `blue` and deletes both namespaces, which removes the veth pair too. The script also removes `~/labs/11.2`.
 
 ## Coreutils used
 

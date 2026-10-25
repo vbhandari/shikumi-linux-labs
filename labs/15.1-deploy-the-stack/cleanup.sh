@@ -4,4 +4,5 @@ set -uo pipefail
 # shellcheck source=bin/lib.sh
 . "$(dirname "$(readlink -f "$0")")/../../bin/lib.sh"
 
+rm -rf "$LAB_HOME/15.1"
 say "Lab 15.1 cleanup done."

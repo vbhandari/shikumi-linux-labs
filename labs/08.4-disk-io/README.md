@@ -62,10 +62,10 @@ fio --name=fsync --filename=fio.dat --size=256M \
 ### Step 5: Compare.
 
 ```bash
-grep -E 'write: IOPS|clat \(' buffered.txt fsync.txt
+grep -E 'write: IOPS|clat \(|sync \(' buffered.txt fsync.txt
 ```
 
-Buffered writes land in the page cache, so fio measures memory. With `--fsync=1` every write waits for the disk. A database that promises durability pays this cost on every commit.
+Buffered writes land in the page cache, so fio measures memory. With `--fsync=1` every write waits for the disk. fio reports the time spent in `fsync` separately, as `sync (usec)`: the write's own `clat` stays small, and the cost shows up there. A database that promises durability pays this cost on every commit.
 
 ## Checks (expected output)
 

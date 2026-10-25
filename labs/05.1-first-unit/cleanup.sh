@@ -9,4 +9,5 @@ if [[ -f /etc/systemd/system/shikumi-api.service.d/limits.conf ]]; then
   as_root systemctl daemon-reload
   as_root systemctl try-restart shikumi-api
 fi
+rm -rf "$LAB_HOME/5.1"
 say "Lab 5.1 cleanup done."

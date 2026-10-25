@@ -10,6 +10,8 @@ check "profile loaded in enforce mode" bash -c "sudo cat /sys/kernel/security/ap
 label="$(sudo cat "/proc/$(main_pid shikumi-api)/attr/current" 2>/dev/null | tr -d '\0')"
 check "shikumi-api.service is confined (${label:-none})" test "$label" = "$prof (enforce)"
 check "/data returns 200" test "$(http_status 'http://127.0.0.1:8000/data?name=hello.txt')" = 200
-check "a DENIED line exists for the profile" bash -c "sudo journalctl -k -q --no-pager -g 'apparmor=\"DENIED\"' | grep -q 'profile=\"$prof\"'"
+check "shikumi-api.service is active" systemctl is-active --quiet shikumi-api
+denied="$(sudo journalctl -k -q --no-pager -g 'apparmor="DENIED"' 2>/dev/null | grep -F "profile=\"$prof\"")"
+check "the profile denied /srv/shikumi-data/hello.txt" grep -qF 'name="/srv/shikumi-data/hello.txt"' <<<"$denied"
 check "data-dir.conf removed" test ! -e /etc/systemd/system/shikumi-api.service.d/data-dir.conf
 finish

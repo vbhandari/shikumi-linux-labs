@@ -57,6 +57,7 @@ Close the connection once the response is sent, in every case. Then start it aga
 
 ```bash
 python3 closewait.py &
+sleep 1
 for i in $(seq 1 20); do
   curl -s -m 2 http://127.0.0.1:8200/ >/dev/null
 done

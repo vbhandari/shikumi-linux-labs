@@ -43,7 +43,7 @@ APP=$!
 sleep 1
 python3 ~/shikumi-linux-labs/app/loadgen.py \
   'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 | \
-  tee slow.txt &
+  tee slow.txt & L=$!
 ```
 
 ### Step 3: Record 20 seconds of stacks.
@@ -60,10 +60,11 @@ Ubuntu builds with frame pointers, so `-g` works. You see the interpreter's C fu
 ### Step 4: Restart with -X perf and record again.
 
 ```bash
-wait; kill $APP
+wait $L; kill $APP
 python3 -X perf ~/shikumi-linux-labs/app/shikumi_api.py --port 8500 & APP=$!
 sleep 1
-python3 ~/shikumi-linux-labs/app/loadgen.py 'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 &
+python3 ~/shikumi-linux-labs/app/loadgen.py \
+  'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 & L=$!
 sudo perf record -e cpu-clock -F 99 -g -p $APP -o perf-py.data -- sleep 20
 sudo perf report -f -i perf-py.data --stdio --no-children --sort sym 2>/dev/null > report-py.txt
 grep -m 5 'py::' report-py.txt
@@ -83,23 +84,23 @@ Copy `flame.svg` to the host and open it in a browser. Width is time on CPU. `su
 ### Step 6: Fix the hot path and compare.
 
 ```bash
-wait; kill $APP
+wait $L; kill $APP
 SHIKUMI_FAST_CHECKSUM=1 python3 -X perf \
   ~/shikumi-linux-labs/app/shikumi_api.py --port 8500 &
 APP=$!
 sleep 1
 python3 ~/shikumi-linux-labs/app/loadgen.py \
   'http://127.0.0.1:8500/checksum?kb=256' -c 4 -n 400 | \
-  tee fast.txt &
+  tee fast.txt & L=$!
 sudo perf record -e cpu-clock -F 99 -g -p $APP \
   -o perf-fast.data -- sleep 10
 sudo perf report -f -i perf-fast.data --stdio --no-children \
   --sort sym 2>/dev/null > report-fast.txt
-wait; kill $APP
+wait $L; kill $APP
 grep -E 'rps|p50' slow.txt fast.txt
 ```
 
-`SHIKUMI_FAST_CHECKSUM=1` swaps the pure-Python loop for `zlib.adler32`, written in C. Same answer, a fraction of the CPU.
+`SHIKUMI_FAST_CHECKSUM=1` swaps the pure-Python loop for `zlib.adler32`, written in C. Same answer, a fraction of the CPU. `wait $L` waits for the load generator only: the app runs until you kill it, so a bare `wait` would never return.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >

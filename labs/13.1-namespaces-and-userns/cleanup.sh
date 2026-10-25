@@ -12,4 +12,5 @@ else
   bad "kernel.apparmor_restrict_unprivileged_userns is $v, expected 1. Restore it: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=1"
   exit 1
 fi
+rm -rf "$LAB_HOME/13.1"
 say "Lab 13.1 cleanup done."

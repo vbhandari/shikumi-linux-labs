@@ -13,4 +13,5 @@ if [[ -d "$cg" ]]; then
 fi
 as_root rm -rf "$LAB_HOME/13.3/rootfs"
 remove_shikumi_unshare
+rm -rf "$LAB_HOME/13.3"
 say "Lab 13.3 cleanup done."

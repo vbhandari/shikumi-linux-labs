@@ -28,15 +28,16 @@ cd ~/labs/7.2
 
 ```bash
 PID=$(systemctl show -p MainPID --value shikumi-api@8001)
-sudo timeout 15 strace -f -tt -p "$PID" -o async.txt & sleep 1
+sudo timeout 15 strace -f -tt -p "$PID" -o async.txt & T=$!
+sleep 1
 python3 ~/shikumi-linux-labs/app/loadgen.py 'http://127.0.0.1:8001/slow?ms=200' -c 10 -n 50
-wait
+wait $T
 grep -c epoll_wait async.txt
 grep -m 3 accept4 async.txt
 awk '{print $1}' async.txt | sort -u | wc -l
 ```
 
-One thread serves all ten connections. It sleeps in `epoll_wait` until a socket is ready, and accepts with `accept4(..., SOCK_NONBLOCK|SOCK_CLOEXEC)`.
+One thread serves all ten connections. It sleeps in `epoll_wait` until a socket is ready, and accepts with `accept4(..., SOCK_CLOEXEC)`. Python opens every descriptor close-on-exec, so the flag is always there. asyncio makes the new socket non-blocking with a separate call right after, so `SOCK_NONBLOCK` does not appear.
 
 ### Step 2: Trace a threaded server under the same load.
 

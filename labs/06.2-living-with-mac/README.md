@@ -7,6 +7,7 @@
 ## Before you start
 
 - Lab 6.1 done (profile loaded in enforce mode).
+- As in Lab 6.1, paste one block at a time, and wait for the prompt after `aa-complain` and `aa-enforce`.
 
 ## Files in this folder
 
@@ -40,19 +41,29 @@ The read succeeds, the cache write is denied, and the request fails with 500.
 
 ```bash
 sudo aa-complain /opt/shikumi/bin/shikumi-api
+```
+
+Wait for `Setting /opt/shikumi/bin/shikumi-api to complain mode.`, then repeat the request:
+
+```bash
 curl -s 'http://127.0.0.1:8001/data?name=hello.txt'; echo
 sudo journalctl -k -g 'apparmor="ALLOWED"' -n 2 --no-pager
 ```
 
 In complain mode the profile logs what it would have denied, and allows it.
 
-### Step 3: Let aa-logprof propose the rule.
+### Step 3: Let aa-logprof propose the rule, from the cache events only.
 
 ```bash
-sudo aa-logprof
+g='shikumi-api" name="/var/cache/shikumi/'
+sudo journalctl -k -b --no-pager -g "$g" > cache.log
+wc -l cache.log
+sudo aa-logprof -f cache.log
 ```
 
-Choose **(G)lob** until the path reads `/var/cache/shikumi/*`, then **(A)llow**, and **(S)ave**.
+Plain `sudo aa-logprof` reads every AppArmor event on the system, including old ones from 6.1 and from other profiles such as `systemd-detect-virt`. `-f cache.log` limits it to the cache events. Choose **(G)lob** until the path reads `/var/cache/shikumi/*`, then **(A)llow**, and **(S)ave**.
+
+If aa-logprof still offers anything that is not under `/var/cache/shikumi`, or for a profile other than `/opt/shikumi/bin/shikumi-api`, choose **(I)gnore**. Never save changes to another profile, and don't accept `/srv/shikumi-data`: that would undo Lab 6.1.
 
 Instead of `aa-logprof`, you can install the reference rule, which keeps site-specific rules in `local/`:
 
@@ -121,11 +132,11 @@ cd ~
 ~/shikumi-linux-labs/labs/06.2-living-with-mac/cleanup.sh
 ```
 
-Removes the `cache.conf` drop-in and restarts the instances. The profile and its local rule stay; Lab 15.1 installs them again anyway.
+Removes the `cache.conf` drop-in, restarts the instances and removes `~/labs/6.2`. The profile and its local rule stay; Lab 15.1 installs them again anyway.
 
 ## Coreutils used
 
-`install`, `ls`, `cat`, `tr`. On Ubuntu 26.04 these come from uutils; if one behaves differently, run its GNU build as `gnu<cmd>` (for example `gnustat`).
+`install`, `ls`, `cat`, `tr`, `wc`. On Ubuntu 26.04 these come from uutils; if one behaves differently, run its GNU build as `gnu<cmd>` (for example `gnustat`).
 
 ## Tested
 

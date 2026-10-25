@@ -103,7 +103,7 @@ cd ~
 ~/shikumi-linux-labs/labs/05.4-templates-and-timers/cleanup.sh
 ```
 
-Removes the test `.tmp` files. The instances and the timer stay for later labs.
+Removes the test `.tmp` files. The instances and the timer stay for later labs. The script also removes `~/labs/5.4`.
 
 ## Coreutils used
 

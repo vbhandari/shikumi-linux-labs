@@ -5,4 +5,6 @@ set -uo pipefail
 . "$(dirname "$(readlink -f "$0")")/../../bin/lib.sh"
 
 as_root sed -i '/# shikumi-lab$/d' /etc/hosts
+command -v resolvectl >/dev/null && as_root resolvectl flush-caches 2>/dev/null
+rm -rf "$LAB_HOME/9.2"
 say "Lab 9.2 cleanup done."

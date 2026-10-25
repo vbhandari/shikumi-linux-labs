@@ -66,6 +66,7 @@ From here on, every command runs inside the VM unless a step says *on the host*.
 **On a cloud VM** (Hetzner, AWS and so on), skip steps 1 to 5. Create an Ubuntu 26.04 VM with your SSH key in the provider's console, log in with `ssh USER@VM_IP`, and provision it yourself:
 
 ```bash
+sudo apt-get update
 sudo apt-get install -y git      # if git is missing
 [ -d ~/shikumi-linux-labs/.git ] || git clone \
   https://github.com/vbhandari/shikumi-linux-labs.git \
@@ -73,7 +74,7 @@ sudo apt-get install -y git      # if git is missing
 sudo bash ~/shikumi-linux-labs/vm/provision.sh
 ```
 
-Then log out and back in, so new group memberships apply, and go on with step 6. `USER@VM_IP` stands for your login and the server's public address; later labs use the same placeholder.
+A fresh cloud image has no package lists yet, so `apt-get update` comes first. Then log out and back in, so new group memberships apply, and go on with step 6. `USER@VM_IP` stands for your login and the server's public address; later labs use the same placeholder.
 
 ### Step 6: Inside the VM, make sure the repo is there.
 
@@ -83,7 +84,7 @@ cd ~
 git -C ~/shikumi-linux-labs log -1 --oneline
 ```
 
-The VM has its own clone in your home directory, `~/shikumi-linux-labs`: cloud-init (Multipass) or `provision.sh --clone vagrant` (Vagrant) cloned it from GitHub during provisioning. Nothing is shared with the host's copy: Multipass mounts nothing and the Vagrant synced folder is turned off. The second line clones it now if provisioning could not. To update later, run `git -C ~/shikumi-linux-labs pull` inside the VM.
+The VM has its own clone in your home directory, `~/shikumi-linux-labs`: cloud-init (Multipass) or `provision.sh --clone vagrant` (Vagrant) cloned it from GitHub during provisioning, and on a cloud VM you cloned it yourself in step 5. Nothing is shared with the host's copy: Multipass mounts nothing and the Vagrant synced folder is turned off. The second line clones it now if provisioning could not. To update later, run `git -C ~/shikumi-linux-labs pull` inside the VM. `git pull` works only on a branch: if `git status` says `HEAD detached` (you checked out a tag or a commit), run `git -C ~/shikumi-linux-labs checkout main` first.
 
 ### Step 7: Run the lab setup and the environment check.
 
@@ -147,7 +148,7 @@ cd ~
 ~/shikumi-linux-labs/labs/00.1-provision-and-verify/cleanup.sh
 ```
 
-Nothing to undo. Keep the VM and its `clean` snapshot.
+Removes the empty `~/labs/0.1`; nothing else to undo. Keep the VM and its `clean` snapshot.
 
 ## Coreutils used
 

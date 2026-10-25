@@ -136,7 +136,7 @@ cd ~
 ~/shikumi-linux-labs/labs/13.3-mini-container/cleanup.sh
 ```
 
-Removes the veth, the `shikumi-ctr` cgroup (after killing anything in it), the root filesystem, and `shikumi-unshare` with its profile. Running the Lab 13.1 cleanup too is harmless.
+Removes the veth, the `shikumi-ctr` cgroup (after killing anything in it), the root filesystem, and `shikumi-unshare` with its profile. Running the Lab 13.1 cleanup too is harmless. The script also removes `~/labs/13.3`.
 
 ## Coreutils used
 

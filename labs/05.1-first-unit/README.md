@@ -110,7 +110,7 @@ cd ~
 ~/shikumi-linux-labs/labs/05.1-first-unit/cleanup.sh
 ```
 
-Removes only the `LimitNOFILE` drop-in. The service stays installed and running: the rest of the course builds on it. `bin/shikumi-reset` removes it at the end of the course.
+Removes only the `LimitNOFILE` drop-in. The service stays installed and running: the rest of the course builds on it. `bin/shikumi-reset` removes it at the end of the course. The script also removes `~/labs/5.1`.
 
 ## Coreutils used
 

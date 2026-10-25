@@ -44,21 +44,21 @@ eBPF runs small verified programs inside the kernel. It needs root, and BTF type
 ```bash
 fio --name=bio --filename=fio.dat --size=256M \
   --rw=randwrite --bs=4k --ioengine=psync --direct=1 \
-  --runtime=20 --time_based --output=/dev/null &
+  --runtime=20 --time_based --output=/dev/null & F=$!
 sudo biolatency-bpfcc 5 2
-wait; rm -f fio.dat
+wait $F; rm -f fio.dat
 ```
 
 ### Step 3: Watch nginx connect to its upstreams.
 
 ```bash
-sudo timeout 10 tcpconnect-bpfcc &
+sudo timeout 10 tcpconnect-bpfcc & T=$!
 sleep 2
 for i in 1 2 3 4; do
   curl -s --cacert /etc/nginx/shikumi-tls/ca.crt \
     -o /dev/null https://localhost/healthz
 done
-wait
+wait $T
 ```
 
 Since Lab 12.2, port 80 only redirects, so the requests go to HTTPS, and `--cacert` makes curl trust the lab CA from Lab 12.2. Each one shows nginx connecting to 127.0.0.1 port 8001 or 8002.
@@ -86,11 +86,11 @@ Count with `@opens[comm] = count();`. Press Ctrl-C after a couple of intervals.
 
 ```bash
 ${EDITOR:-nano} request_latency.bt
-sudo bpftrace request_latency.bt &
+sudo bpftrace request_latency.bt & B=$!
 sleep 3
 python3 ~/shikumi-linux-labs/app/loadgen.py \
   'http://127.0.0.1:8001/slow?ms=50' -c 5 -n 100
-sudo pkill -INT bpftrace; wait
+sudo pkill -INT bpftrace; wait $B
 ```
 
 Store `nsecs` in `@start[pid, args.ret]`; on close, `hist()` the difference divided by 1000000, then `delete()` the entry. The histogram should cluster around 50 ms. The reference solutions are in `bpf/` at the top of the repo.

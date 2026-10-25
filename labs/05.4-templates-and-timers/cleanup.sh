@@ -5,4 +5,5 @@ set -uo pipefail
 . "$(dirname "$(readlink -f "$0")")/../../bin/lib.sh"
 
 as_root find /var/lib/shikumi -maxdepth 1 -name '*.tmp' -delete 2>/dev/null
+rm -rf "$LAB_HOME/5.4"
 say "Lab 5.4 cleanup done."

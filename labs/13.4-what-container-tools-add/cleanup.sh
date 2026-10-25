@@ -6,4 +6,5 @@ set -uo pipefail
 
 podman rm -f shikumi-alpine >/dev/null 2>&1
 podman rmi docker.io/library/alpine:3.24 >/dev/null 2>&1
+rm -rf "$LAB_HOME/13.4"
 say "Lab 13.4 cleanup done."

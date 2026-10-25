@@ -9,4 +9,5 @@ sleep 0.5
 findmnt /mnt/shikumi >/dev/null && as_root umount /mnt/shikumi
 [[ -d /mnt/shikumi ]] && as_root rmdir /mnt/shikumi
 rm -f "$LAB_HOME/2.1/disk.img"
+rm -rf "$LAB_HOME/2.1"
 say "Lab 2.1 cleanup done."

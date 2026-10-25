@@ -12,4 +12,5 @@ if [[ -d "$cg" ]]; then
   sleep 1
   as_root rmdir "$cg"
 fi
+rm -rf "$LAB_HOME/13.2"
 say "Lab 13.2 cleanup done."

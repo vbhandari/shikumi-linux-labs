@@ -116,7 +116,7 @@ cd ~
 ~/shikumi-linux-labs/labs/13.1-namespaces-and-userns/cleanup.sh
 ```
 
-Unloads the profile, removes both files, and fails loudly if the userns sysctl is no longer 1. Safe to run before Lab 13.3: its setup reinstalls `shikumi-unshare`.
+Unloads the profile, removes both files, and fails loudly if the userns sysctl is no longer 1. Safe to run before Lab 13.3: its setup reinstalls `shikumi-unshare`. The script also removes `~/labs/13.1`.
 
 ## Coreutils used
 

@@ -6,13 +6,18 @@ abi <abi/4.0>,
 
 include <tunables/global>
 
-/opt/shikumi/bin/shikumi-api {
+# attach_disconnected: systemd's sandbox gives the service its
+# own mount view, so /run/systemd/notify and /dev/null lie
+# outside it. Without the flag AppArmor cannot name them and
+# denies them, even in complain mode.
+/opt/shikumi/bin/shikumi-api flags=(attach_disconnected) {
   include <abstractions/base>
   include <abstractions/python>
 
   network inet stream,
   network inet6 stream,
 
+  /opt/shikumi/bin/ r,
   /opt/shikumi/bin/shikumi-api r,
   /usr/bin/python3.[0-9]* ix,
 

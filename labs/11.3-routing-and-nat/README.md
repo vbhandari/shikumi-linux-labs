@@ -82,10 +82,11 @@ sudo ip netns exec blue curl -sI https://ubuntu.com | head -n 1
 ### Step 6: Watch each hop.
 
 ```bash
-sudo ip netns exec blue ping -c 20 -i 0.5 1.1.1.1 >/dev/null &
+sudo ip netns exec blue ping -c 20 -i 0.5 1.1.1.1 \
+  >/dev/null & P=$!
 sudo tcpdump -ni veth-host -c 2 icmp
 sudo tcpdump -ni "$UPLINK" -c 2 icmp
-wait
+wait $P
 ```
 
 On `veth-host` the source is 10.200.1.2. On the uplink it is the VM's own address: masquerade rewrote it.
@@ -129,7 +130,7 @@ cd ~
 ~/shikumi-linux-labs/labs/11.3-routing-and-nat/cleanup.sh
 ```
 
-Run after Lab 11.4. Deletes the NAT table, the ufw route rule, `veth-host`, any trace table and `/etc/netns/blue`, and restores `ip_forward`.
+Run after Lab 11.4. Deletes the NAT table, the ufw route rule, `veth-host`, any trace table and `/etc/netns/blue`, and restores `ip_forward`. The script also removes `~/labs/11.3`.
 
 ## Coreutils used
 

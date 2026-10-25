@@ -7,4 +7,5 @@ set -uo pipefail
 as_root systemctl stop shikumi-oom.scope 2>/dev/null
 as_root systemctl reset-failed shikumi-oom.scope 2>/dev/null
 pkill -u "$USER" -f alloc.py 2>/dev/null
+rm -rf "$LAB_HOME/8.3"
 say "Lab 8.3 cleanup done."

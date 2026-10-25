@@ -6,7 +6,7 @@
 
 ## Before you start
 
-- A VM restored to the `clean` snapshot from Lab 0.1, with the repo up to date on `main`: `git -C ~/shikumi-linux-labs checkout main && git -C ~/shikumi-linux-labs pull --ff-only` (the `checkout` matters if `git status` says `HEAD detached`).
+- A VM restored to the `clean` snapshot from Lab 0.1, with the repo up to date on `main`: `git -C ~/shikumi-linux-labs checkout main && git -C ~/shikumi-linux-labs pull --ff-only` (the `checkout` matters if `git status` says `HEAD detached`). If you pinned the repo to a release tag on purpose, as the course's VM tests do, this moves you off it; skip the command, or go back afterwards with `git -C ~/shikumi-linux-labs checkout TAG`.
 
 ## Files in this folder
 
@@ -104,7 +104,7 @@ cd ~
 ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/cleanup.sh
 ```
 
-Nothing to undo: Lab 15.2 breaks this stack on purpose. To remove everything the course installed, run `~/shikumi-linux-labs/bin/shikumi-reset`, or restore the `clean` snapshot. Keep the `stack` snapshot for Lab 15.2.
+Removes `~/labs/15.1` and nothing else: Lab 15.2 breaks this stack on purpose. To remove everything the course installed, run `~/shikumi-linux-labs/bin/shikumi-reset`, or restore the `clean` snapshot. Keep the `stack` snapshot for Lab 15.2.
 
 ## Coreutils used
 

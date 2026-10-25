@@ -97,7 +97,7 @@ cd ~
 ~/shikumi-linux-labs/labs/08.3-oom-killer/cleanup.sh
 ```
 
-Stops the `shikumi-oom` scope if it still exists.
+Stops the `shikumi-oom` scope if it still exists, and removes `~/labs/8.3`.
 
 ## Coreutils used
 

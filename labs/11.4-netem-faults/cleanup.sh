@@ -7,4 +7,5 @@ set -uo pipefail
 as_root ip netns exec blue tc qdisc del dev veth-blue root 2>/dev/null
 as_root pkill -x iperf3 2>/dev/null
 say "Next: run the cleanups of Lab 11.3, then Lab 11.2."
+rm -rf "$LAB_HOME/11.4"
 say "Lab 11.4 cleanup done."

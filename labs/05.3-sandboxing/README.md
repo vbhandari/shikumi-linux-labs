@@ -113,7 +113,7 @@ cd ~
 ~/shikumi-linux-labs/labs/05.3-sandboxing/cleanup.sh
 ```
 
-Removes `port80.conf` and any `SHIKUMI_CACHE` lines, if left over. The hardening drop-in stays; later labs expect it.
+Removes `port80.conf` and any `SHIKUMI_CACHE` lines, if left over. The hardening drop-in stays; later labs expect it. The script also removes `~/labs/5.3`.
 
 ## Coreutils used
 
