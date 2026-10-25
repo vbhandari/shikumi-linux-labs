@@ -144,6 +144,26 @@ def make_socket(args):
     return sock
 
 
+def notify_ready():
+    """Tell systemd the service is ready (Type=notify), if systemd asked.
+
+    systemd puts a socket path in $NOTIFY_SOCKET; "@name" means an abstract
+    socket. Outside systemd the variable is unset and this does nothing.
+    """
+    addr = os.environ.get("NOTIFY_SOCKET")
+    if not addr:
+        return False
+    if addr.startswith("@"):
+        addr = "\0" + addr[1:]
+    try:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) as s:
+            s.sendto(b"READY=1", addr)
+    except OSError as e:
+        print(f"shikumi-api: could not notify systemd: {e}", flush=True)
+        return False
+    return True
+
+
 async def serve(args, ready=None):
     app = App(args)
     server = await asyncio.start_server(
@@ -153,6 +173,7 @@ async def serve(args, ready=None):
     for sig in (signal.SIGTERM, signal.SIGINT):
         loop.add_signal_handler(sig, stop.set)
     print(f"shikumi-api pid={os.getpid()} listening on {args.host}:{args.port}", flush=True)
+    notify_ready()   # the socket is bound and listening: systemctl start can return
     if ready:
         ready(server)
     await stop.wait()

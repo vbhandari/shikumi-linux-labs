@@ -56,7 +56,7 @@ sudo journalctl -t shikumi-lab --no-pager
 grep shikumi-lab /var/log/syslog
 ```
 
-On Ubuntu, rsyslog also copies messages to `/var/log/syslog`. The journal is the answer that works everywhere.
+On Ubuntu, rsyslog also copies messages to `/var/log/syslog`, which only group `adm` may read. If `grep` says `Permission denied`, you are not in `adm` yet: `vm/provision.sh` adds you, then log out and back in (or use `sudo grep`). The journal is the answer that works everywhere.
 
 ### Step 5: Check where the journal is stored.
 

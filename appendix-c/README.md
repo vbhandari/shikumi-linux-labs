@@ -11,7 +11,7 @@ Optional reading for the handout's Appendix C. These are not labs, and nothing i
 sudo apt install -y gcc make gdb
 make
 ./epoll_echo &
-sudo -v             # strace needs sudo to attach on Ubuntu
+sudo true           # strace needs sudo to attach on Ubuntu
 sudo strace -f -e trace=epoll_wait,accept4,read,write \
   -p $! &           # attach before the test connection
 sleep 1
@@ -22,6 +22,7 @@ sudo pkill -x strace; kill %1
 # terminal:
 sudo gdb -p "$(pgrep -x deadlock)" -batch \
   -ex 'thread apply all bt'
+# back in the first terminal: Ctrl-C to stop ./deadlock
 make clean
 ```
 

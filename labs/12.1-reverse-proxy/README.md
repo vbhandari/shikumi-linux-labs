@@ -53,7 +53,7 @@ for i in 1 2 3 4; do curl -s http://127.0.0.1/healthz; echo; done
 python3 ~/shikumi-linux-labs/app/loadgen.py http://127.0.0.1/healthz -c 10 -n 200 --by-pid
 ```
 
-From the host, `curl http://VM_IP/healthz` works too.
+From the host, `curl http://VM_IP/healthz` works too (`VM_IP` as in Lab 11.1). On a cloud VM, the provider's firewall must allow port 80 as well.
 
 ### Step 4: Stop one instance and watch traffic move.
 

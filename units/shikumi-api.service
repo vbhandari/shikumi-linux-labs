@@ -1,9 +1,16 @@
 [Unit]
 Description=shikumi-api sample service (Shikumi Labs)
 After=network.target
+# The default is 5 starts in 10 s, which pasting Lab 5.3
+# quickly (6 restarts) hits. A crash loop still trips this.
+StartLimitIntervalSec=30s
+StartLimitBurst=10
 
 [Service]
-Type=exec
+# The app sends READY=1 to $NOTIFY_SOCKET when it listens,
+# so systemctl start returns only when it can take requests.
+Type=notify
+TimeoutStartSec=15s
 User=shikumi
 Group=shikumi
 EnvironmentFile=-/etc/shikumi/shikumi-api.env

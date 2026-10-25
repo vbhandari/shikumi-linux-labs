@@ -14,5 +14,5 @@ check "the two instances have different PIDs" test "$(main_pid shikumi-api@8001)
 check "shikumi-prune.timer is enabled" systemctl is-enabled --quiet shikumi-prune.timer
 check "shikumi-prune.timer is active" systemctl is-active --quiet shikumi-prune.timer
 check "last prune run succeeded" test "$(systemctl show -p Result --value shikumi-prune.service)" = success
-check "old.tmp was pruned" test ! -e /var/lib/shikumi/old.tmp
+check "old.tmp was pruned" as_root test ! -e /var/lib/shikumi/old.tmp
 finish

@@ -36,7 +36,7 @@ sudo ufw --force enable
 sudo ufw status verbose
 ```
 
-Multipass and Vagrant both reach the VM over SSH on port 22. Open a **new** SSH session from the host now. If it works, cancel the undo:
+Multipass, Vagrant and cloud VMs all reach the VM over SSH on port 22. On a cloud VM, the provider's own firewall (Hetzner Cloud Firewall, AWS security groups) also filters traffic before it reaches ufw. Open a **new** SSH session from the host now. If it works, cancel the undo:
 
 ```bash
 sudo systemctl stop shikumi-ufw-revert.timer
@@ -51,7 +51,9 @@ python3 ~/shikumi-linux-labs/app/shikumi_api.py --host 0.0.0.0 --port 8010 &
 python3 ~/shikumi-linux-labs/app/shikumi_api.py --host 0.0.0.0 --port 8011 &
 ```
 
-On the host, `curl -m 3 http://VM_IP:8010/healthz` times out: ufw's default policy denies incoming connections.
+On the host, `curl -m 3 http://VM_IP:8010/healthz` times out: ufw's default policy denies incoming connections. `VM_IP` is the address in `~/labs/9.1/vm-ip.txt` (on a cloud VM that maps addresses, the public one).
+
+**On a public cloud VM**, `--host 0.0.0.0` and the rules in step 3 open these ports to the whole internet, not just to your host. In the provider's firewall, allow 8010 and 8011 only from your host's public address, or keep them closed there and skip the host tests. Run the cleanup as soon as you finish.
 
 ### Step 3: Allow both ports.
 

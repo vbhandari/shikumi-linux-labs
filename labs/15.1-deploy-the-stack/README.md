@@ -6,7 +6,7 @@
 
 ## Before you start
 
-- A VM restored to the `clean` snapshot from Lab 0.1, with the repo up to date (`git -C ~/shikumi-linux-labs pull`).
+- A VM restored to the `clean` snapshot from Lab 0.1, with the repo up to date on `main`: `git -C ~/shikumi-linux-labs checkout main && git -C ~/shikumi-linux-labs pull --ff-only` (the `checkout` matters if `git status` says `HEAD detached`).
 
 ## Files in this folder
 
@@ -29,7 +29,7 @@ cd ~/labs/15.1
 less ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/deploy.sh
 ```
 
-Each block repeats a lab you have done: 2.2, 5.1, 5.3, 5.4, 6.2, 11.1, 12.1 and 12.2. Every command is safe to run twice. `deploy.sh` sits at the lab's root and runs from the repo; it is not copied to `~/labs`. It puts `ca.crt`, `server.crt` and `server.key` in `/etc/nginx/shikumi-tls/` and does not keep the CA key.
+Each block repeats a lab you have done: 2.2, 5.1, 5.3, 5.4, 6.2, 11.1, 12.1 and 12.2. Every command is safe to run twice. `deploy.sh` sits at the lab's root and runs from the repo; it is not copied to `~/labs`. It puts `ca.crt`, `server.crt` and `server.key` in `/etc/nginx/shikumi-tls/` and deletes the CA key, which nothing on the stack needs.
 
 ### Step 2: Run it.
 
@@ -40,10 +40,11 @@ sudo ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/deploy.sh
 ### Step 3: Confirm SSH still works, then cancel the firewall undo.
 
 ```bash
-sudo systemctl stop shikumi-ufw-revert.timer
+systemctl is-active --quiet shikumi-ufw-revert.timer &&
+  sudo systemctl stop shikumi-ufw-revert.timer
 ```
 
-Open a new SSH session from the host first. If it fails, wait 10 minutes: ufw turns itself off.
+Open a new SSH session from the host first. If it fails, wait 10 minutes: ufw turns itself off. `deploy.sh` arms the undo only when ufw was not active yet, so if ufw was already on (after Lab 11.1, or on a second run) there is no timer and this step does nothing.
 
 ### Step 4: Check each layer yourself, then run the check.
 
@@ -75,7 +76,7 @@ multipass stop shikumi && multipass snapshot shikumi --name stack && multipass s
 vagrant snapshot save ubuntu stack
 ```
 
-Lab 15.2 breaks this stack seven times. `break.sh --undo` repairs it; if a drill goes badly wrong, `multipass restore shikumi.stack` (or `vagrant snapshot restore ubuntu stack`) brings it back.
+Lab 15.2 breaks this stack seven times. `break.sh --undo` repairs it; if a drill goes badly wrong, `multipass restore shikumi.stack` (or `vagrant snapshot restore ubuntu stack`) brings it back. On a cloud VM, take the `stack` snapshot in the provider's console, and restore it from there.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >

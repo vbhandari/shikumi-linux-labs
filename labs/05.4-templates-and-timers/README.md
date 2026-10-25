@@ -58,6 +58,8 @@ sudo systemctl enable --now shikumi-prune.timer
 systemctl list-timers shikumi-prune.timer --no-pager
 ```
 
+The VM booted more than 5 minutes ago, so `OnBootSec=5min` has already passed and the prune job runs as soon as the timer starts. Right afterwards `list-timers` may show `NEXT` as `-`; run it again and the next run is 15 minutes after the last one (`OnUnitActiveSec=15min`).
+
 ### Step 4: Test the prune job without waiting for the timer.
 
 ```bash
@@ -68,7 +70,7 @@ sudo journalctl -u shikumi-prune -n 5 --no-pager
 ls /var/lib/shikumi
 ```
 
-Only `old.tmp` is deleted. Unlike cron, a timer's runs are in the journal, and `Persistent=true` can catch up on runs missed while the VM was off.
+Only `old.tmp` is deleted. Unlike cron, a timer's runs are in the journal. A calendar timer (`OnCalendar=`) with `Persistent=true` also catches up on a run missed while the VM was off. `Persistent=` applies only to `OnCalendar=`, so this timer, which counts from boot and from its last run, does not need it.
 
 ### Step 5: Compare with cron, and look at socket units.
 

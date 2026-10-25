@@ -24,6 +24,10 @@ include <tunables/global>
 
   @{PROC}/@{pid}/fd/ r,
 
+  # Type=notify: tell systemd (unconfined) the app is ready.
+  @{run}/systemd/notify w,
+  unix (connect, send) type=dgram peer=(label=unconfined),
+
   # Site-specific additions (Lab 6.2 adds the cache directory here).
   include if exists <local/opt.shikumi.bin.shikumi-api>
 }

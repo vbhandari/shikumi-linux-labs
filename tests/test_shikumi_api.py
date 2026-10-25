@@ -124,5 +124,64 @@ class ServerTests(unittest.TestCase):
         self.assertTrue(all(p.poll() is None for p in procs))
 
 
+class NotifyTests(unittest.TestCase):
+    """notify_ready() against a fake $NOTIFY_SOCKET, the way systemd listens."""
+
+    def listen(self, addr):
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        sock.bind(addr)
+        sock.settimeout(5)
+        self.addCleanup(sock.close)
+        return sock
+
+    def set_env(self, value):
+        old = os.environ.pop("NOTIFY_SOCKET", None)
+        if value is not None:
+            os.environ["NOTIFY_SOCKET"] = value
+        self.addCleanup(lambda: os.environ.pop("NOTIFY_SOCKET", None))
+        if old is not None:
+            self.addCleanup(os.environ.__setitem__, "NOTIFY_SOCKET", old)
+
+    def test_noop_without_notify_socket(self):
+        self.set_env(None)
+        self.assertFalse(shikumi_api.notify_ready())
+
+    def test_path_socket_gets_ready(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = os.path.join(tmp.name, "notify")
+        sock = self.listen(path)
+        self.set_env(path)
+        self.assertTrue(shikumi_api.notify_ready())
+        self.assertEqual(sock.recv(64), b"READY=1")
+
+    def test_abstract_socket_gets_ready(self):
+        name = f"shikumi-test-{os.getpid()}-{time.monotonic_ns()}"
+        sock = self.listen("\0" + name)
+        self.set_env("@" + name)
+        self.assertTrue(shikumi_api.notify_ready())
+        self.assertEqual(sock.recv(64), b"READY=1")
+
+    def test_missing_socket_is_not_fatal(self):
+        self.set_env("/nonexistent/notify")
+        self.assertFalse(shikumi_api.notify_ready())
+
+    def test_server_is_listening_when_ready_arrives(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        path = os.path.join(tmp.name, "notify")
+        sock = self.listen(path)
+        port = free_port()
+        proc = subprocess.Popen([sys.executable, str(APP), "--port", str(port),
+                                 "--data-dir", tmp.name],
+                                stdout=subprocess.PIPE, text=True,
+                                env={**os.environ, "NOTIFY_SOCKET": path})
+        self.addCleanup(stop, proc)
+        self.assertEqual(sock.recv(64), b"READY=1")
+        # No sleep: the first request after READY=1 must be answered.
+        status, _ = asyncio.run(loadgen.get(f"http://127.0.0.1:{port}/healthz", 5))
+        self.assertEqual(status, 200)
+
+
 if __name__ == "__main__":
     unittest.main()

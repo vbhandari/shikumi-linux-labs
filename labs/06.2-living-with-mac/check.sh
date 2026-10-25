@@ -12,5 +12,5 @@ for p in 8001 8002; do
   check "shikumi-api@$p is confined (${label:-none})" test "$label" = "$prof (enforce)"
   check "port $p /data returns 200" test "$(http_status "http://127.0.0.1:$p/data?name=hello.txt")" = 200
 done
-check "cache file written" test -f /var/cache/shikumi/hello.txt.cache
+check "cache file written" as_root test -f /var/cache/shikumi/hello.txt.cache
 finish

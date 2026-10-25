@@ -2,7 +2,7 @@
 
 **Module M02 · Files, filesystems, users and permissions** · about 25 min · [Lab index](../../README.md#lab-index)
 
-**Goal:** Fill a small filesystem from a process that keeps a deleted log file open, find the space with `lsof +L1`, recover it, and then run out of inodes instead of bytes.
+**Goal:** Fill a small filesystem from a process that keeps a deleted log file open, find the space with `lsof -a +L1`, recover it, and then run out of inodes instead of bytes.
 
 ## Before you start
 
@@ -46,7 +46,7 @@ sudo chown "$USER": /mnt/shikumi
 df -h /mnt/shikumi; df -i /mnt/shikumi
 ```
 
-`-N 2000` asks for very few inodes, which step 5 uses.
+`-N 2000` asks for very few inodes, which step 6 uses.
 
 ### Step 3: In a second terminal, fill it from a process that keeps its log open.
 
@@ -61,11 +61,11 @@ It stops with `No space left on device` and keeps running.
 ```bash
 rm /mnt/shikumi/app.log
 df -h /mnt/shikumi
-du -sh /mnt/shikumi
-lsof +L1 /mnt/shikumi
+sudo du -sh /mnt/shikumi
+lsof -a +L1 /mnt/shikumi
 ```
 
-`df` still shows the disk full, `du` finds almost nothing, and `lsof +L1` lists the deleted file (link count 0) with its PID and FD number. Recover the space without stopping the process by truncating it through `/proc`:
+`df` still shows the disk full, `du` finds almost nothing, and `lsof -a +L1` lists the deleted file (link count 0) with its PID and FD number. `-a` matters: without it `lsof` ORs its selections and lists every deleted-but-open file on the system, plus everything open on `/mnt/shikumi`. `du` runs with sudo only because `lost+found` is root's. Recover the space without stopping the process by truncating it through `/proc`:
 
 ### Step 5: Recover the space, then stop holdlog.py.
 
@@ -115,7 +115,7 @@ The hard link shares the inode and survives; the symlink now points at nothing.
 ```
 
 - `/mnt/shikumi` is mounted and less than half full
-- No deleted-but-open files remain on it (`lsof +L1` is empty)
+- No deleted-but-open files remain on it (`lsof -a +L1 /mnt/shikumi` is empty)
 - Inode use is below half (the `many` directory is gone)
 
 ## Stretch challenge

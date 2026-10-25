@@ -56,13 +56,13 @@ netplan's YAML is rendered into systemd-networkd configuration at boot.
 
 ```bash
 ip -4 -br a show scope global
-echo "ADDRESS" > vm-ip.txt     # replace ADDRESS with the right one
-# on the host:
+echo "VM_IP" > vm-ip.txt   # type the address, not VM_IP
+# on the host (Multipass only: show the address):
 multipass info shikumi | grep IPv4
-ping -c 2 ADDRESS
+ping -c 2 VM_IP
 ```
 
-With Multipass, it is the address `multipass info` shows. With Vagrant, use the address on the second interface (the `private_network`); the first is NAT and the host cannot reach it.
+`VM_IP` is a placeholder: type the address itself. With Multipass, it is the address `multipass info` shows. With Vagrant, use the address on the second interface (the `private_network`); the first is NAT and the host cannot reach it. On a cloud VM, it is the public address you SSH to, if `ip a` shows it on the uplink (Hetzner does). Some providers (AWS, GCP) map the public address to a private one that `ip a` shows instead: write the private one into `vm-ip.txt`, because the check looks for an address on the VM, and use the public one from the host. Many cloud firewalls drop ping; if it fails, `ssh USER@VM_IP true` tests the path instead.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >

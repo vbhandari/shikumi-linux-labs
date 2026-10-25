@@ -81,7 +81,7 @@ The TTL from the stub counts down between runs: resolved caches answers.
 
 ## Stretch challenge
 
-Find out which DNS server the stub forwards to (`resolvectl dns`) and query it directly with `dig @ADDRESS`. Is the answer the same as through the stub?
+Find out which DNS server the stub forwards to (`resolvectl dns`) and query it directly with `dig @SERVER`, where `SERVER` is the address `resolvectl dns` printed. Is the answer the same as through the stub?
 
 ## Cleanup
 

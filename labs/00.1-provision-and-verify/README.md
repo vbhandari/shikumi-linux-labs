@@ -8,6 +8,7 @@
 
 - A laptop or desktop with 4 GB RAM and 20 GB disk to spare, and either [Multipass](https://canonical.com/multipass) or [Vagrant](https://developer.hashicorp.com/vagrant) with a provider (VirtualBox, VMware or Parallels).
 - `git` on the host, to fetch the VM files.
+- Or, instead of a local VM, any Ubuntu 26.04 cloud VM you can SSH into (Hetzner, AWS and so on): see **On a cloud VM** in step 5.
 
 ## Files in this folder
 
@@ -62,6 +63,16 @@ vagrant ssh
 
 From here on, every command runs inside the VM unless a step says *on the host*.
 
+**On a cloud VM** (Hetzner, AWS and so on), skip steps 1 to 5. Create an Ubuntu 26.04 VM with your SSH key in the provider's console, log in with `ssh USER@VM_IP`, and provision it yourself:
+
+```bash
+sudo apt-get install -y git      # if git is missing
+git clone https://github.com/vbhandari/shikumi-linux-labs.git
+sudo bash ~/shikumi-linux-labs/vm/provision.sh
+```
+
+Then log out and back in, so new group memberships apply, and go on with step 6. `USER@VM_IP` stands for your login and the server's public address; later labs use the same placeholder.
+
 ### Step 6: Inside the VM, make sure the repo is there.
 
 ```bash
@@ -85,11 +96,13 @@ Every line under *Required tools* should say PASS. If any is missing, provisioni
 ### Step 8: Try the five shell essentials you will use in every lab.
 
 ```bash
-sudo -v; echo "exit status: $?"
+sudo true; echo "exit status: $?"
 ./bin/shikumi-check env | grep -i coreutils
 man unshare      # q to quit
 journalctl -b | less   # q to quit
 ```
+
+`sudo true` should print `exit status: 0`. Use it, not `sudo -v`, to test sudo: with sudo-rs, `sudo -v` fails for accounts that use NOPASSWD rules and have no password, which is how Multipass and most cloud images set up their user. `journalctl -b` shows the whole system's log only to members of `adm` or `systemd-journal`. `provision.sh` adds you to both; if you see only your own messages, log out and back in.
 
 ### Step 9: Leave the VM and, on the host, take the clean snapshot.
 
@@ -100,7 +113,7 @@ multipass stop shikumi && multipass snapshot shikumi --name clean && multipass s
 vagrant snapshot save ubuntu clean
 ```
 
-Take more snapshots the same way before M06, M11 and M13, named `pre-m06`, `pre-m11` and `pre-m13`, so a broken lab is one restore away: `multipass restore shikumi.clean` or `vagrant snapshot restore ubuntu clean`. Lab 15.1 starts from `clean` and saves `stack`.
+Take more snapshots the same way before M06, M11 and M13, named `pre-m06`, `pre-m11` and `pre-m13`, so a broken lab is one restore away: `multipass restore shikumi.clean` or `vagrant snapshot restore ubuntu clean`. Lab 15.1 starts from `clean` and saves `stack`. On a cloud VM, take the snapshots in the provider's console instead.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
@@ -123,7 +136,7 @@ Take more snapshots the same way before M06, M11 and M13, named `pre-m06`, `pre-
 
 ## Stretch challenge
 
-Run `multipass info shikumi` (or `vagrant ssh-config`) and note the VM's IP address. You will use it from the host in Labs 1.3 and 11.1.
+Run `multipass info shikumi` (or `vagrant ssh-config`) and note the VM's IP address; on a cloud VM it is the address you SSH to. Later labs write it as `VM_IP`, Lab 9.1 saves it in `~/labs/9.1/vm-ip.txt`, and Labs 1.3 and 11.1 use it from the host.
 
 ## Cleanup
 

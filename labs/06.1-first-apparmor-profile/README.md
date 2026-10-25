@@ -49,18 +49,17 @@ sudo aa-genprof /opt/shikumi/bin/shikumi-api
 
 It puts an empty profile in complain mode and waits. Leave it at its prompt.
 
-### Step 4: In a second terminal, run the app by its path and exercise it.
+### Step 4: In a second terminal, start the service and exercise it.
 
 ```bash
-sudo -u shikumi /opt/shikumi/bin/shikumi-api --port 8600 &
-sleep 1
-curl -s http://127.0.0.1:8600/healthz; echo
-curl -s 'http://127.0.0.1:8600/data?name=hello.txt'; echo
-curl -s 'http://127.0.0.1:8600/files?n=3'; echo
-sudo pkill -f 'shikumi-api --port 8600'
+sudo systemctl start shikumi-api
+curl -s http://127.0.0.1:8000/healthz; echo
+curl -s 'http://127.0.0.1:8000/data?name=hello.txt'; echo
+curl -s 'http://127.0.0.1:8000/files?n=3'; echo
+sudo systemctl stop shikumi-api
 ```
 
-`/data?name=NAME` reads `NAME` from the data directory, `/var/lib/shikumi` unless `SHIKUMI_DATA_DIR` or `--data-dir` says otherwise; `setup.sh` put `hello.txt` there. Names that leave the directory get 400. Step 8 moves the data directory to `/srv/shikumi-data`, outside the profile.
+Run it as the real service, so the profile sees everything the service does, including the `READY=1` message it sends to systemd's notify socket (Lab 5.1). `/data?name=NAME` reads `NAME` from the data directory, `/var/lib/shikumi` unless `SHIKUMI_DATA_DIR` or `--data-dir` says otherwise; `setup.sh` put `hello.txt` there. Names that leave the directory get 400. Step 8 moves the data directory to `/srv/shikumi-data`, outside the profile.
 
 ### Step 5: Back in aa-genprof, press S to scan, then answer the prompts.
 
@@ -69,6 +68,7 @@ sudo pkill -f 'shikumi-api --port 8600'
 - Abstractions such as `python` and `nameservice`: allow them.
 - `/var/lib/shikumi/hello.txt`: choose **(G)lob** until it reads `/var/lib/shikumi/*`, then allow.
 - Network `inet stream`: allow.
+- Write access to `/run/systemd/notify` (or a `unix` rule for it): **(A)llow**. That is the `READY=1` message; without it, `systemctl start` waits 15 seconds and fails.
 
 Press **S** to save and **F** to finish. The profile is now in enforce mode in `/etc/apparmor.d/opt.shikumi.bin.shikumi-api`. If the session went wrong, install the reference profile instead (next step).
 
@@ -88,6 +88,8 @@ sudo systemctl start shikumi-api
 ps -eZ | grep shikumi-api
 curl -s 'http://127.0.0.1:8000/data?name=hello.txt'; echo
 ```
+
+If `systemctl start` waits and then fails with a timeout, the profile is blocking the `READY=1` message: `sudo journalctl -k -g 'apparmor="DENIED"' -n 3` names `/run/systemd/notify`. Install the reference profile (step 6), which allows it, and start the service again.
 
 ### Step 8: Ask for a file the profile does not allow.
 

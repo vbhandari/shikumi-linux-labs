@@ -50,8 +50,7 @@ if [[ ! -f $tls/server.crt ]]; then
   (cd "$work" && bash "$REPO/labs/12.2-tls-and-http2/files/make-certs.sh" >/dev/null)
   install -m 0644 "$work/server.crt" "$work/ca.crt" "$tls/"
   install -m 0600 "$work/server.key" "$tls/"
-  install -m 0600 "$work/ca.key" /etc/shikumi/ca.key
-  rm -rf "$work"
+  rm -rf "$work"   # the CA key goes with it: nothing needs it
 fi
 
 step "nginx"

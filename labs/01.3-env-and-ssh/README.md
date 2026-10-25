@@ -7,7 +7,7 @@
 ## Before you start
 
 - Lab 1.2 done.
-- An SSH client on the host (built into macOS, Linux and Windows 10 or later).
+- An SSH client on the host (built into macOS, Linux and Windows 10 or later), and `rsync` on the host for step 5 (or use `scp`, which comes with SSH).
 
 ## Files in this folder
 
@@ -43,7 +43,7 @@ env | grep SHIKUMI
 python3 ~/shikumi-linux-labs/app/shikumi_api.py
 ```
 
-It prints `listening on 127.0.0.1:8080`. Leave it running. Because it listens on 127.0.0.1, nothing outside the VM can reach it directly.
+It prints `shikumi-api pid=NNNN listening on 127.0.0.1:8080`. Leave it running. Because it listens on 127.0.0.1, nothing outside the VM can reach it directly.
 
 ### Step 3: On the host, make sure the VM accepts your SSH key.
 
@@ -54,23 +54,29 @@ multipass exec shikumi -- bash -c "echo '$(cat ~/.ssh/id_ed25519.pub)' >> ~/.ssh
 multipass info shikumi | grep IPv4
 ```
 
-Vagrant already set up a key for you; skip this step.
+Vagrant already set up a key for you, and on a cloud VM you already log in with your key: skip this step.
 
 ### Step 4: On the host, open a tunnel from your port 8080 to the VM's 127.0.0.1:8080.
 
 ```bash
-ssh -N -L 8080:127.0.0.1:8080 ubuntu@VM_IP
+ssh -N -L 8080:127.0.0.1:8080 USER@VM_IP
 # or, with Vagrant:
 vagrant ssh -- -N -L 8080:127.0.0.1:8080
 ```
 
-Then open <http://localhost:8080/healthz> in the host's browser. The request travels inside SSH to the VM, where it arrives from 127.0.0.1.
+`USER@VM_IP` is a placeholder for your VM login: with Multipass, `ubuntu@` and the address from step 3; on a cloud VM, your own user and the server's public address. Then open <http://localhost:8080/healthz> in the host's browser. The request travels inside SSH to the VM, where it arrives from 127.0.0.1.
 
-### Step 5: Copy files between the host and the VM with rsync.
+### Step 5: Copy a file from the VM to the host with rsync.
 
 ```bash
-rsync -av ubuntu@VM_IP:labs/1.2/answers.txt .
+# inside the VM:
+echo "made on $(hostname)" > ~/labs/1.3/from-vm.txt
+# on the host:
+rsync -av USER@VM_IP:labs/1.3/from-vm.txt .
+scp USER@VM_IP:labs/1.3/from-vm.txt .   # same, without rsync
 ```
+
+rsync must be installed on both ends. `provision.sh` installs it in the VM; if the host has none (Windows, some minimal installs), use the `scp` line. With Vagrant, `vagrant ssh-config` shows the user, address, port and key to use.
 
 ## Checks (expected output)
 

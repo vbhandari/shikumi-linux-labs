@@ -49,6 +49,19 @@ mkdir -p /var/log/journal
 systemd-tmpfiles --create --prefix /var/log/journal
 systemctl restart systemd-journald
 
+# Log access (Lab 0.1 journalctl, Lab 5.2 /var/log/syslog). Multipass's
+# ubuntu user is in adm already; cloud and hand-made users often are not.
+LAB_USER="${CLONE_USER:-${SUDO_USER:-}}"
+getent group adm >/dev/null || groupadd --system adm
+if [[ -n $LAB_USER && $LAB_USER != root ]] && getent passwd "$LAB_USER" >/dev/null; then
+  for g in adm systemd-journal; do
+    if getent group "$g" >/dev/null && ! id -nG "$LAB_USER" | tr ' ' '\n' | grep -qx "$g"; then
+      usermod -aG "$g" "$LAB_USER"
+      echo "added $LAB_USER to $g; log out and back in to use it"
+    fi
+  done
+fi
+
 if [[ -n $CLONE_USER ]]; then
   home="$(getent passwd "$CLONE_USER" | cut -d: -f6)"
   if [[ -d "$home/shikumi-linux-labs/.git" ]]; then

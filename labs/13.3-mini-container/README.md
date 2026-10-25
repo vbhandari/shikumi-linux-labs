@@ -40,12 +40,12 @@ setup.sh fetched the Alpine minirootfs for `$(uname -m)` and checked its SHA-256
 sudo unshare --mount --uts --ipc --net --pid --fork bash
 ```
 
-Run the following steps inside this root shell. `unshare` makes the new mount namespace's mounts private, so nothing you mount leaks to the host.
+Run the following steps inside this root shell. Its `~` is root's home, not yours: `sudo` sets `HOME=/root`, so the next step finds your lab folder through `$SUDO_USER`. `unshare` makes the new mount namespace's mounts private, so nothing you mount leaks to the host.
 
 ### Step 3: Make the new root a mount point, and switch to it.
 
 ```bash
-cd ~/labs/13.3          # if HOME changed under sudo, cd to the full path instead
+cd "$(getent passwd "$SUDO_USER" | cut -d: -f6)/labs/13.3"
 mount --bind rootfs rootfs
 cd rootfs
 mkdir -p .old

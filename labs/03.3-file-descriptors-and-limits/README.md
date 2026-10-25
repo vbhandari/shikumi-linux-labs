@@ -52,7 +52,7 @@ ls /proc/$APP/fd | wc -l
 curl -s -m 3 http://127.0.0.1:8000/healthz; echo "curl exit=$?"
 ```
 
-The first request returns `OSError: [Errno 24] Too many open files`. The app now sits at its limit: its output fills with `socket.accept() out of system resource`, and a new connection only gets in when another closes. A leak degrades the whole service, not one request.
+The first request returns `OSError: [Errno 24] Too many open files`. The app now holds 63 of its 64 descriptors, and its output fills with `socket.accept() out of system resource` while it retries. `/healthz` probably still answers: one descriptor is free again once the failed request's socket closes, so new connections get in one at a time. Under real traffic most of them would wait or time out. A leak degrades the whole service, not one request.
 
 ### Step 4: Restart it with a higher limit and repeat.
 

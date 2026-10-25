@@ -6,7 +6,7 @@ set -uo pipefail
 
 say "Lab 2.1: Disk full, but nothing is big"
 check "/mnt/shikumi is mounted" findmnt /mnt/shikumi
-if [[ -n "$(as_root lsof +L1 /mnt/shikumi 2>/dev/null)" ]]; then bad "no deleted-but-open files on /mnt/shikumi"; else ok "no deleted-but-open files on /mnt/shikumi"; fi
+if [[ -n "$(as_root lsof -a +L1 /mnt/shikumi 2>/dev/null)" ]]; then bad "no deleted-but-open files on /mnt/shikumi"; else ok "no deleted-but-open files on /mnt/shikumi"; fi
 use="$(df --output=pcent /mnt/shikumi 2>/dev/null | tail -n1 | tr -dc '0-9')"
 check "space use below 50% (now ${use:-?}%)" test "${use:-100}" -lt 50
 iuse="$(df --output=ipcent /mnt/shikumi 2>/dev/null | tail -n1 | tr -dc '0-9')"

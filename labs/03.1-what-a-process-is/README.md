@@ -42,7 +42,7 @@ grep -E 'open files|processes' /proc/$APP/limits
 cat /proc/$APP/status > status.txt
 ```
 
-`exe` points at the Python interpreter, not the script: the script is only an argument.
+`exe` points at the Python interpreter, not the script: the script is only an argument. On Ubuntu 26.04, `ls -l` (uutils) prints a stray `+` after the mode of the socket links, as in `lrwx------+1`. That is a display quirk, not an ACL: `gnuls -l /proc/$APP/fd` shows the GNU view.
 
 ### Step 3: Move a process through its states.
 

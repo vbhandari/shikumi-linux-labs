@@ -30,6 +30,8 @@ sysctl -n net.ipv4.ip_forward > ip_forward.orig
 sudo sysctl -w net.ipv4.ip_forward=1
 ```
 
+Forwarding makes the VM a router. **On a public cloud VM** that is safe here only because ufw's forward policy stays DROP and step 4 allows just `veth-host` to the uplink. Never set ufw's forward policy to ACCEPT on a public host, and run the cleanup when you finish: it restores `ip_forward`.
+
 ### Step 2: Connect blue to the host.
 
 ```bash

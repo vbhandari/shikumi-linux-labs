@@ -16,7 +16,7 @@ check "fault 1 cleared" test "${lim:-0}" -ge 1024
 check "fault 2 cleared" test "$(ss -Htan state close-wait | wc -l)" -eq 0
 fs=/var/log/shikumi-drill
 if findmnt "$fs" >/dev/null; then
-  check "fault 3 cleared" bash -c "[[ -z \$(sudo lsof +L1 $fs 2>/dev/null) ]] && (( \$(df --output=pcent $fs | tail -n1 | tr -dc '0-9') < 90 ))"
+  check "fault 3 cleared" bash -c "[[ -z \$(sudo lsof -a +L1 $fs 2>/dev/null) ]] && (( \$(df --output=pcent $fs | tail -n1 | tr -dc '0-9') < 90 ))"
 else
   ok "fault 3 cleared"
 fi

@@ -6,7 +6,7 @@
 
 ## Before you start
 
-- Lab 2.2 done, up to the point before its cleanup (you need `shikumi`, `deploy` and `deployer`). If you already cleaned up, re-run Lab 2.2 steps 2 and 3.
+- Lab 2.2 done: you need `shikumi`, `deploy` and `deployer`, which its cleanup keeps. If one is missing, re-run Lab 2.2 steps 2 and 3.
 
 ## Files in this folder
 
@@ -57,6 +57,8 @@ sudo ls -l /srv/shikumi
 sudo -u shikumi cat /srv/shikumi/release.txt
 sudo -u shikumi touch /srv/shikumi/nope
 ```
+
+The `+` after the mode of `release.txt` means it has an ACL, inherited from the default ACL. Ubuntu 26.04's `ls` (uutils) prints it with no space before the link count, as in `-rw-rw----+1`.
 
 ### Step 5: Compare with the sticky bit on /tmp.
 

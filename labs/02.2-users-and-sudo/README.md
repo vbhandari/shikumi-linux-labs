@@ -98,7 +98,7 @@ Give `deployer` a password (`sudo passwd deployer`), switch to it with `su - dep
 ~/shikumi-linux-labs/labs/02.2-users-and-sudo/cleanup.sh
 ```
 
-Removes the sudoers rule and the `deployer` account. It keeps the `shikumi` user and the `deploy` group, which later labs use.
+Removes the sudoers rule. It keeps the `shikumi` user, the `deploy` group and the `deployer` account, which Lab 2.3 and later labs use; `bin/shikumi-reset` removes them at the end of the course.
 
 ## Coreutils used
 

@@ -36,9 +36,9 @@ Each is min, default and max in bytes. With `tcp_moderate_rcvbuf=1` the kernel g
 ```bash
 iperf3 -s -p 5201 & S=$!
 sleep 1
-iperf3 -c 127.0.0.1 -p 5201 -t 10 | tee default.txt &
+iperf3 -c 127.0.0.1 -p 5201 -t 10 | tee default.txt & C=$!
 sleep 4; ss -tmi '( dport = :5201 )' | head -n 8
-wait %2
+wait $C
 ```
 
 `skmem:(r...,rb...)` shows the receive buffer in use and its size, `rcv_space` what autotuning chose, `cwnd` the congestion window, `rtt` the round-trip time.

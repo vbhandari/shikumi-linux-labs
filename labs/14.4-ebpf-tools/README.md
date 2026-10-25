@@ -32,7 +32,9 @@ cd ~/labs/14.4
 ls -l /sys/kernel/btf/vmlinux
 sudo bpftrace --version
 ls /usr/sbin/*-bpfcc | head
-ls /usr/share/bpftrace/tools 2>/dev/null | head || dpkg -L bpftrace | grep '\.bt$' | head
+d=/usr/share/bpftrace/tools
+if [ -d "$d" ]; then ls "$d" | head
+else dpkg -L bpftrace | grep '\.bt$' | head; fi
 ```
 
 eBPF runs small verified programs inside the kernel. It needs root, and BTF type information lets tools work across kernel versions.

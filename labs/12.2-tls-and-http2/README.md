@@ -74,9 +74,13 @@ ALPN is how client and server agree on h2 during the TLS handshake. `Verify retu
 ### Step 6: Reach it from the host.
 
 ```bash
-# on the host, after copying ca.crt out of the VM (multipass transfer or vagrant scp):
-curl --cacert ca.crt --resolve shikumi.test:443:VM_IP https://shikumi.test/healthz
+# on the host: copy ca.crt out of the VM, then connect
+scp USER@VM_IP:labs/12.2/ca.crt .
+curl --cacert ca.crt --resolve shikumi.test:443:VM_IP \
+  https://shikumi.test/healthz
 ```
+
+`USER@VM_IP` is your VM login, as in Lab 1.3, and `VM_IP` the address from Lab 9.1. With Vagrant, copy the file with `vagrant ssh -c 'cat labs/12.2/ca.crt' > ca.crt` instead. On a cloud VM, the provider's firewall must allow port 443.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
