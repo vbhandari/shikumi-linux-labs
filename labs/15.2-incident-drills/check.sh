@@ -21,7 +21,7 @@ else
   ok "fault 3 cleared"
 fi
 check "fault 4 cleared" test "$(http_status "http://127.0.0.1:8002/data?name=hello.txt")" = 200
-check "fault 5 cleared" test "$(systemctl show -p MemoryMax --value shikumi-api@8001)" = infinity
+check "fault 5 cleared" test "$(systemctl show -p MemoryMax --value shikumi-api@8001)" = 268435456
 if systemctl is-active --quiet shikumi-drill-6; then
   check "fault 6 cleared" bash -c "systemctl show -p Environment shikumi-api@8001 | grep -q SHIKUMI_FAST_CHECKSUM=1"
 else

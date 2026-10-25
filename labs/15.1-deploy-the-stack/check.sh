@@ -19,6 +19,14 @@ check "exposure below 5.0 (${score:-?})" awk -v s="${score:-99}" 'BEGIN { exit !
 ca=/etc/nginx/shikumi-tls/ca.crt
 check "HTTPS over HTTP/2 returns 200" test "$(curl -s --cacert "$ca" -o /dev/null -w '%{http_version} %{http_code}' https://localhost/healthz)" = "2 200"
 check "HTTP redirects with 301" test "$(http_status http://127.0.0.1/healthz)" = 301
+a="$(curl -s --cacert "$ca" -o /dev/null -w '%{http_code}' 'https://localhost/alloc?mb=0')"
+check "nginx refuses /alloc ($a)" test "$a" = 404
+for p in 8001 8002; do
+  mm="$(systemctl show -p MemoryMax --value "shikumi-api@$p")"
+  check "shikumi-api@$p MemoryMax=256M ($mm)" test "$mm" = 268435456
+  tm="$(systemctl show -p TasksMax --value "shikumi-api@$p")"
+  check "shikumi-api@$p TasksMax=64 ($tm)" test "$tm" = 64
+done
 st="$(sudo ufw status 2>/dev/null)"
 check "ufw active" grep -q '^Status: active' <<<"$st"
 for r in OpenSSH 80/tcp 443/tcp; do check "ufw allows $r" grep -q "^$r .*ALLOW" <<<"$st"; done

@@ -63,7 +63,7 @@ kill $A
 systemctl show -p OOMScoreAdjust,MemoryMax shikumi-api
 ```
 
-Anyone may raise their own score; lowering it needs privilege. Units set it with `OOMScoreAdjust=` and cap memory with `MemoryMax=`.
+Anyone may raise their own score; lowering it needs privilege. Units set it with `OOMScoreAdjust=` and cap memory with `MemoryMax=`. `shikumi-api` shows `MemoryMax=268435456`, the 256 MB cap in its unit file: a leak in the service is killed inside its own cgroup, as in step 2, and never turns into a system OOM.
 
 ### Step 5: Check for a user-space OOM daemon.
 

@@ -48,26 +48,28 @@ sudo ip -n red link set veth-red up
 sudo ip -n blue -br a
 ```
 
-### Step 3: Ping across, and see that the host cannot.
+### Step 3: Ping across, and see that the host cannot reach blue.
 
 ```bash
 sudo ip netns exec red ping -c 3 10.200.0.1
 ip -br link | grep veth || echo "no veth on the host"
-ping -c 1 -W 1 10.200.0.1 || echo "the host has no route to 10.200.0.0/24"
+ip route get 10.200.0.1
 ```
 
-`ip netns exec` runs a command inside the namespace; it does not trace or observe anything. Each namespace has its own interfaces, routes and firewall.
+The host has no route of its own to 10.200.0.0/24. `ip route get` shows it would use the default route, out of the uplink (`dev eth0` or similar) to the provider's or hypervisor's gateway, which knows nothing about blue. Don't ping 10.200.0.1 from the host to prove it: the packet would leave on the uplink with a private destination address. `ip netns exec` runs a command inside the namespace; it does not trace or observe anything. Each namespace has its own interfaces, routes and firewall.
 
 ### Step 4: Run the app in blue and call it from red.
 
 ```bash
-sudo ip netns exec blue sudo -u "$USER" python3 ~/shikumi-linux-labs/app/shikumi_api.py --host 10.200.0.1 --port 8020 &
+sudo ip netns exec blue sudo -u "$USER" \
+  python3 ~/shikumi-linux-labs/app/shikumi_api.py \
+  --host 10.200.0.1 --port 8020 >/dev/null &
 sleep 1
 sudo ip netns exec red curl -s http://10.200.0.1:8020/healthz; echo
 sudo ip netns exec blue ss -tln
 ```
 
-Leave the app running for Labs 11.3 and 11.4.
+Leave the app running for Labs 11.3 and 11.4. `>/dev/null` keeps its access log (one `GET /healthz 200` line per request) out of your terminal; errors still show.
 
 ## Checks (expected output)
 

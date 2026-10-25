@@ -53,7 +53,7 @@ python3 ~/shikumi-linux-labs/app/shikumi_api.py --host 0.0.0.0 --port 8011 &
 
 On the host, `curl -m 3 http://VM_IP:8010/healthz` times out: ufw's default policy denies incoming connections. `VM_IP` is the address in `~/labs/9.1/vm-ip.txt` (on a cloud VM that maps addresses, the public one).
 
-**On a public cloud VM**, `--host 0.0.0.0` and the rules in step 3 open these ports to the whole internet, not just to your host. In the provider's firewall, allow 8010 and 8011 only from your host's public address, or keep them closed there and skip the host tests. Run the cleanup as soon as you finish.
+**On a public cloud VM**, `--host 0.0.0.0` and the rules in step 3 open these ports to the whole internet, not just to your host. ufw is not enough here: it is the thing this lab takes apart. Keep the provider's firewall from Lab 0.1 in front (inbound SSH from your own IP only). For the host tests, add 8010/tcp and 8011/tcp there **from your own public IP only**, or skip the host tests. Remove those provider rules and run the cleanup as soon as you finish. Without a provider firewall, anyone on the internet can reach both apps for as long as they run, including after step 5's undo fires.
 
 ### Step 3: Allow both ports.
 
@@ -85,6 +85,8 @@ sudo nft list table inet shikumi
 
 From the host, 8010 still answers and 8011 times out, although ufw allows it. A packet must pass the base chain of every table on the hook; an accept in one table does not override a drop in another. The counter in the `shikumi` table shows each dropped SYN.
 
+After 5 minutes the undo deletes the table, and 8011 answers again. That is by design. If the check runs after that, it says the undo fired and passes. To see the drop again, load the table once more with the `nft -f` line.
+
 > **Fedora / RHEL-family (alternate path, untested)**
 >
 > firewalld manages zones instead of a single rule list:
@@ -111,7 +113,7 @@ From the host, 8010 still answers and 8011 times out, although ufw allows it. A 
 - ufw is active and allows OpenSSH, 8010/tcp and 8011/tcp
 - The ufw undo timer is no longer pending
 - ufw's chains appear in `nft list ruleset`
-- The `inet shikumi` table is loaded and drops 8011 (load it again if its 5-minute undo already fired)
+- The `inet shikumi` table is loaded and drops 8011, or the check notes that its 5-minute undo already removed it
 
 ## Stretch challenge
 

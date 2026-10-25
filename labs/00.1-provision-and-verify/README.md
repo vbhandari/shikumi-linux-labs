@@ -63,7 +63,11 @@ vagrant ssh
 
 From here on, every command runs inside the VM unless a step says *on the host*.
 
-**On a cloud VM** (Hetzner, AWS and so on), skip steps 1 to 5. Create an Ubuntu 26.04 VM with your SSH key in the provider's console, log in with `ssh USER@VM_IP`, and provision it yourself:
+**Pasting: one code block at a time.** Paste a block, wait for the prompt, then paste the next. Most terminals use *bracketed paste*, which hands the whole block to the shell before anything runs. Without it, a `sudo` line reads the lines pasted after it as its own input, and they never run. If lines appear but don't run, paste them again one at a time. Every lab follows this convention.
+
+**On a cloud VM** (Hetzner, AWS and so on), skip steps 1 to 5. A cloud VM has a public address, so firewall it first. Before you create the VM, set up the provider's firewall (Hetzner Cloud Firewall, AWS security group and so on): allow inbound 22/tcp **from your own public IP address only**, and nothing else. On the host, `curl -s https://ifconfig.me` shows that address. Later labs open ports in ufw (8010 and 8011 in Lab 11.1, 80 and 443 in Labs 12.1 and 12.2). With the provider's firewall in front, those ports stay closed to the internet. To test one from the host, add a rule for that port from your own IP only, and remove it afterwards. Never open a lab VM's ports to `0.0.0.0/0`: its sample app has endpoints that burn CPU and hold memory on purpose.
+
+Then create an Ubuntu 26.04 VM with your SSH key in the provider's console, attach the firewall, log in with `ssh USER@VM_IP`, and provision it yourself:
 
 ```bash
 sudo apt-get update

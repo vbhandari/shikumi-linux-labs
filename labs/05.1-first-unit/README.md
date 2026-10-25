@@ -50,7 +50,7 @@ systemctl status shikumi-api --no-pager
 curl -s http://127.0.0.1:8000/healthz; echo
 ```
 
-`Type=notify` makes `systemctl start` wait until the app reports that it is ready: once its socket is listening, it sends `READY=1` to the socket systemd names in `$NOTIFY_SOCKET`. That is why the `curl` straight after `enable --now` gets an answer. With `Type=exec`, systemd would report success as soon as the program had started, before Python was listening. `StateDirectory=shikumi` creates `/var/lib/shikumi`, owned by `shikumi`.
+`Type=notify` makes `systemctl start` wait until the app reports that it is ready: once its socket is listening, it sends `READY=1` to the socket systemd names in `$NOTIFY_SOCKET`. That is why the `curl` straight after `enable --now` gets an answer. `MemoryHigh=`, `MemoryMax=` and `TasksMax=` cap what the service may use, so a leak cannot take the VM down; Lab 8.3 shows what happens at the cap. With `Type=exec`, systemd would report success as soon as the program had started, before Python was listening. `StateDirectory=shikumi` creates `/var/lib/shikumi`, owned by `shikumi`.
 
 ### Step 3: Give the app a file to serve.
 

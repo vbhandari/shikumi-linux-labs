@@ -35,6 +35,7 @@ To get updates later: `git -C ~/shikumi-linux-labs pull`.
   - `check.sh` verifies the result without changing anything, and exits 0 or 1. Run it as `bin/shikumi-check lab <lab>`, for example `bin/shikumi-check lab 5.1`.
   - `cleanup.sh` undoes the lab. It is safe to run twice, and it keeps what later labs build on; the README says when to run it.
 - A few labs have a script that runs from the repo rather than from `~/labs`: `labs/15.1-deploy-the-stack/deploy.sh` and `labs/15.2-incident-drills/break.sh`. Scripts the lab works on, such as `mystery.sh` in Lab 14.1, are in the lab's `files/` folder and `setup.sh` copies them.
+- Paste one code block at a time: see *Pasting* in [Lab 0.1](labs/00.1-provision-and-verify/README.md), step 5. Without bracketed paste, a `sudo` line swallows the lines pasted after it.
 - Run the labs in order. Steps are for Ubuntu 26.04; grey **Fedora / RHEL-family** boxes and **Debian** notes show where other distributions differ.
 - Every resource the labs create is named `shikumi`. Sysctls change for the current boot only, and every cleanup restores them.
 - Snapshots have fixed names: `clean` after Lab 0.1, `pre-m06`, `pre-m11` and `pre-m13` before those modules, and `stack` after Lab 15.1. A broken lab is one restore away.
@@ -42,6 +43,11 @@ To get updates later: `git -C ~/shikumi-linux-labs pull`.
 - Nothing in this repo is a real secret. Lab certificates and keys are generated on your VM.
 - The VM setup installs the course tools but not nginx: Lab 4.1 installs it. On Ubuntu 26.04 `/tmp` is a tmpfs in RAM, so lab data lives under `~/labs`.
 - `bin/shikumi-reset` removes everything the course installed, at the end.
+
+## Safety on a public cloud VM
+
+**Threat model:** the sample app has endpoints that hold memory, burn CPU and leak descriptors on purpose, and Labs 11.1, 12.1 and 12.2 open ports in ufw, so on a VM with a public address anyone on the internet could reach them and take the VM down.
+**Defences:** a provider firewall that allows only SSH from your own IP (set up in Lab 0.1), an nginx site that proxies only `/healthz`, an app that listens on 127.0.0.1 and bounds each lab endpoint (`/alloc` holds at most 512 MB), and units capped at `MemoryMax=256M` and `TasksMax=64`.
 
 ## Lab index
 

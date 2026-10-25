@@ -50,10 +50,12 @@ sudo ip netns exec blue ping -c 2 10.200.1.1
 ```bash
 cat ~/shikumi-linux-labs/config/nftables/nat.nft
 sudo nft -f ~/shikumi-linux-labs/config/nftables/nat.nft
+sudo ip netns exec blue \
+  curl -s -m 5 -o /dev/null -w '%{http_code}\n' http://1.1.1.1
 sudo ip netns exec blue ping -c 2 -W 2 1.1.1.1
 ```
 
-It still fails. ufw's default forward policy is DROP (`grep FORWARD /etc/default/ufw`), so the host refuses to route blue's packets.
+curl prints `000` after 5 seconds: TCP still can't get out. ufw's default forward policy is DROP (`grep FORWARD /etc/default/ufw`), so the host refuses to route blue's connections. The ping gets through anyway: ufw's `before.rules` accept ICMP echo requests in FORWARD by default. That makes ping a poor test of a firewall, so this lab tests with TCP.
 
 ### Step 4: Allow forwarding from blue to the uplink only.
 
@@ -97,10 +99,14 @@ On `veth-host` the source is 10.200.1.2. On the uplink it is the VM's own addres
 sudo nft add table inet shikumi_trace
 sudo nft 'add chain inet shikumi_trace pre { type filter hook prerouting priority -350; }'
 sudo nft add rule inet shikumi_trace pre ip saddr 10.200.1.2 icmp type echo-request meta nftrace set 1
-sudo ip netns exec blue ping -c 1 1.1.1.1 >/dev/null &
-sudo timeout 3 nft monitor trace | head -n 20
+sudo timeout 3 nft monitor trace | head -n 20 & M=$!
+sleep 1
+sudo ip netns exec blue ping -c 1 1.1.1.1 >/dev/null
+wait $M
 sudo nft delete table inet shikumi_trace
 ```
+
+Start the monitor first: it shows only packets sent after it subscribes. The trace runs from prerouting into FORWARD and ends at `ufw-before-forward`'s ICMP accept, the rule that let step 3's ping through.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
@@ -116,7 +122,7 @@ sudo nft delete table inet shikumi_trace
 ~/shikumi-linux-labs/bin/shikumi-check lab 11.3
 ```
 
-- `blue` can ping 1.1.1.1
+- `blue` reaches `http://1.1.1.1/` over TCP (any HTTP status, not `000`)
 - The `ip shikumi_nat` table and the ufw route rule are in place
 
 ## Stretch challenge
@@ -130,7 +136,7 @@ cd ~
 ~/shikumi-linux-labs/labs/11.3-routing-and-nat/cleanup.sh
 ```
 
-Run after Lab 11.4. Deletes the NAT table, the ufw route rule, `veth-host`, any trace table and `/etc/netns/blue`, and restores `ip_forward`. The script also removes `~/labs/11.3`.
+Run after Lab 11.4. Deletes the NAT table, the ufw route rule, `veth-host`, any trace table and `/etc/netns/blue` (and `/etc/netns` itself if that leaves it empty), and restores `ip_forward`. The script also removes `~/labs/11.3`.
 
 ## Coreutils used
 

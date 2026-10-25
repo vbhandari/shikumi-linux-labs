@@ -18,6 +18,20 @@ from urllib.parse import parse_qs, urlsplit
 HELD_FILES = []    # /files keeps these open on purpose (fd leak lab)
 HELD_MEMORY = []   # /alloc keeps these allocated on purpose (memory labs)
 
+# Upper bounds for the lab endpoints, so one request (or a stranger
+# who reaches the port) cannot hold the VM's memory or CPU for long.
+# The systemd units cap the service with MemoryMax= as well.
+LIMITS = {"ms_slow": 60_000, "ms_cpu": 10_000, "kb": 16_384,
+          "mb": 256, "mb_total": 512, "n": 10_000}
+
+
+def num(q, key, default, hi):
+    """Read an integer query parameter in 0..hi, or raise ValueError."""
+    v = int(q.get(key, default))
+    if not 0 <= v <= hi:
+        raise ValueError(f"{key} must be between 0 and {hi}")
+    return v
+
 
 def env(name, default):
     return os.environ.get(name, default)
@@ -64,24 +78,28 @@ class App:
         if path == "/healthz":
             return 200, {"status": "ok", "uptime_s": round(time.time() - self.started, 1)}
         if path == "/slow":
-            await asyncio.sleep(int(q.get("ms", "1000")) / 1000)
-            return 200, {"slept_ms": int(q.get("ms", "1000"))}
+            ms = num(q, "ms", "1000", LIMITS["ms_slow"])
+            await asyncio.sleep(ms / 1000)
+            return 200, {"slept_ms": ms}
         if path == "/cpu":
-            end = time.perf_counter() + int(q.get("ms", "100")) / 1000
+            end = time.perf_counter() + num(q, "ms", "100", LIMITS["ms_cpu"]) / 1000
             n = 0
             while time.perf_counter() < end:
                 n += 1
             return 200, {"loops": n}
         if path == "/checksum":
-            data = os.urandom(int(q.get("kb", "256")) * 1024)
+            data = os.urandom(num(q, "kb", "256", LIMITS["kb"]) * 1024)
             fn = fast_checksum if env("SHIKUMI_FAST_CHECKSUM", "") == "1" else slow_checksum
             return 200, {"checksum": fn(data)}
         if path == "/alloc":
-            mb = int(q.get("mb", "10"))
+            mb = num(q, "mb", "10", LIMITS["mb"])
+            held = sum(len(b) for b in HELD_MEMORY) // (1024 * 1024)
+            if held + mb > LIMITS["mb_total"]:
+                raise ValueError(f"would hold more than {LIMITS['mb_total']} MB")
             HELD_MEMORY.append(bytearray(mb * 1024 * 1024))
             return 200, {"held_mb": sum(len(b) for b in HELD_MEMORY) // (1024 * 1024)}
         if path == "/files":
-            for _ in range(int(q.get("n", "10"))):
+            for _ in range(num(q, "n", "10", LIMITS["n"])):
                 HELD_FILES.append(open(os.devnull, "rb"))
             return 200, {"held_files": len(HELD_FILES)}
         if path == "/data":

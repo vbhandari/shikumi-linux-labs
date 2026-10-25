@@ -68,6 +68,24 @@ class RouteTests(unittest.TestCase):
         self.route("/files", "n=3")
         self.assertEqual(len(shikumi_api.HELD_FILES), before + 3)
 
+    def test_limits_reject_out_of_range(self):
+        for path, query in [("/slow", "ms=60001"), ("/cpu", "ms=-1"),
+                            ("/checksum", "kb=16385"), ("/alloc", "mb=257"),
+                            ("/files", "n=10001")]:
+            with self.assertRaises(ValueError, msg=path):
+                self.route(path, query)
+
+    def test_alloc_total_is_capped(self):
+        limits = dict(shikumi_api.LIMITS)
+        shikumi_api.LIMITS["mb_total"] = 3
+        try:
+            self.assertEqual(self.route("/alloc", "mb=2")[0], 200)
+            with self.assertRaises(ValueError):
+                self.route("/alloc", "mb=2")
+        finally:
+            shikumi_api.LIMITS.update(limits)
+            shikumi_api.HELD_MEMORY.clear()
+
     def test_checksums_agree(self):
         data = os.urandom(4096)
         self.assertEqual(shikumi_api.slow_checksum(data), shikumi_api.fast_checksum(data))

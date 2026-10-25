@@ -37,7 +37,7 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 ```
 
-Ubuntu reads `sites-enabled/`; the default site would also claim port 80. The site file is always `/etc/nginx/sites-available/shikumi`: Lab 12.2 overwrites it with `tls.conf`.
+The site proxies **only `/healthz`**; nginx answers 404 for every other path. The app's other endpoints are for labs on 127.0.0.1:800x: `/alloc` holds memory, `/cpu` and `/checksum` burn CPU, `/files` leaks descriptors and `/slow` holds connections. Port 80 may face the internet, so an allowlist is the safe default. Ubuntu reads `sites-enabled/`; the default site would also claim port 80. The site file is always `/etc/nginx/sites-available/shikumi`: Lab 12.2 overwrites it with `tls.conf`.
 
 ### Step 2: Enable nginx again and open port 80.
 
@@ -45,7 +45,13 @@ Ubuntu reads `sites-enabled/`; the default site would also claim port 80. The si
 sudo systemctl enable --now nginx
 sudo ufw allow 80/tcp
 for i in 1 2 3 4; do curl -s http://127.0.0.1/healthz; echo; done
+curl -s -o /dev/null -w '%{http_code}\n' \
+  'http://127.0.0.1/alloc?mb=0'
 ```
+
+The last request prints `404`: nginx refuses it before it reaches the app. The four `/healthz` answers may all come from one instance, because each nginx worker keeps its own round-robin position; step 3's concurrent load spreads them.
+
+**On a public cloud VM**, `ufw allow 80/tcp` opens port 80 to the whole internet unless the provider's firewall stops it. Keep the Lab 0.1 provider firewall in front, and for the host test in step 3 allow 80/tcp there from your own public IP only.
 
 ### Step 3: Spread load and count responses per instance.
 
@@ -53,7 +59,7 @@ for i in 1 2 3 4; do curl -s http://127.0.0.1/healthz; echo; done
 python3 ~/shikumi-linux-labs/app/loadgen.py http://127.0.0.1/healthz -c 10 -n 200 --by-pid
 ```
 
-From the host, `curl http://VM_IP/healthz` works too (`VM_IP` as in Lab 11.1). On a cloud VM, the provider's firewall must allow port 80 as well.
+From the host, `curl http://VM_IP/healthz` works too (`VM_IP` as in Lab 11.1). On a cloud VM, that needs a provider-firewall rule for 80/tcp from your own IP only (step 2).
 
 ### Step 4: Stop one instance and watch traffic move.
 
@@ -62,9 +68,10 @@ sudo systemctl stop shikumi-api@8002
 python3 ~/shikumi-linux-labs/app/loadgen.py http://127.0.0.1/healthz -c 10 -n 200 --by-pid
 sudo tail -n 3 /var/log/nginx/error.log
 sudo systemctl start shikumi-api@8002
+sleep 11
 ```
 
-nginx notices the failed connection, retries the request on 8001 and marks 8002 as down for `fail_timeout` (10 s). Open-source nginx only checks passively, by real requests; it has no active health checks.
+nginx notices the failed connection, retries the request on 8001 and marks 8002 as down for `fail_timeout` (10 s). Open-source nginx only checks passively, by real requests; it has no active health checks. `sleep 11` waits out that 10 s: until then nginx sends nothing to 8002, even though it is running again, and the check would see only one PID.
 
 ### Step 5: See what the app sees.
 
@@ -93,6 +100,7 @@ Every request now comes from 127.0.0.1, which is nginx. The `X-Forwarded-For` he
 - nginx is enabled, active and its configuration passes `nginx -t`
 - ufw allows 80/tcp
 - 200 requests through port 80 are answered by two different PIDs
+- Only `/healthz` is proxied: `/alloc` through port 80 returns 404
 
 ## Stretch challenge
 

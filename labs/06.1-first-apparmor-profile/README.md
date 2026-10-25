@@ -8,7 +8,7 @@
 
 - Lab 5.4 done.
 - Take a VM snapshot first (`multipass snapshot`, `vagrant snapshot save`, or your cloud provider's console).
-- Paste one block at a time. After `sudo systemctl start` or `aa-complain`, wait for the prompt before you paste more: lines typed ahead while they run can be lost.
+- Paste one block at a time, as in Lab 0.1 (*Pasting*). This lab has many `sudo` lines, and without bracketed paste each one swallows the lines pasted after it.
 
 ## Files in this folder
 

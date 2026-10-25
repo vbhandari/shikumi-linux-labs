@@ -34,14 +34,14 @@ Each is min, default and max in bytes. With `tcp_moderate_rcvbuf=1` the kernel g
 ### Step 2: Run iperf3 on loopback and watch the socket.
 
 ```bash
-iperf3 -s -p 5201 & S=$!
+iperf3 -s -B 127.0.0.1 -p 5201 & S=$!
 sleep 1
 iperf3 -c 127.0.0.1 -p 5201 -t 10 | tee default.txt & C=$!
 sleep 4; ss -tmi '( sport = :5201 )' | head -n 8
 wait $C
 ```
 
-`sport = :5201` selects the server's sockets, the receiving end, where autotuning happens (the client's own receive buffer barely moves). `skmem:(r...,rb...)` shows the receive buffer in use and its size, `rcv_space` what autotuning chose, `cwnd` the congestion window, `rtt` the round-trip time.
+`-B 127.0.0.1` keeps the server on loopback. Without it, iperf3 listens on every address, and before Lab 11.1 no firewall stands in front of it. `sport = :5201` selects the server's sockets, the receiving end, where autotuning happens (the client's own receive buffer barely moves). `skmem:(r...,rb...)` shows the receive buffer in use and its size, `rcv_space` what autotuning chose, `cwnd` the congestion window, `rtt` the round-trip time.
 
 ### Step 3: Lower the maximum for this boot only, and compare.
 

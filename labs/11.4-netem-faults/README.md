@@ -52,7 +52,7 @@ sudo ip netns exec red \
   -c 5 -n 100 --timeout 1 --retries 2 | tee netem.txt
 ```
 
-p50 rises by about 100 ms. A lost SYN is resent after one second, longer than the client's timeout, so some requests need a retry. This is how timeouts and retry storms are reproduced before production finds them.
+p50 rises by about 200 ms, not 100. netem delays every packet leaving `veth-blue`, and loadgen opens a new connection for each request, so each request waits twice: 100 ms for the SYN-ACK, then 100 ms for the response. That is two delayed round trips. A lost SYN is resent after one second, longer than the client's timeout, so some requests need a retry. This is how timeouts and retry storms are reproduced before production finds them.
 
 ### Step 4: Watch the congestion window grow under delay.
 

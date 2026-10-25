@@ -7,7 +7,7 @@
 ## Before you start
 
 - Lab 6.1 done (profile loaded in enforce mode).
-- As in Lab 6.1, paste one block at a time, and wait for the prompt after `aa-complain` and `aa-enforce`.
+- Paste one block at a time, as in Lab 0.1 (*Pasting*).
 
 ## Files in this folder
 

@@ -31,6 +31,8 @@ cd ~/labs/12.2
 openssl x509 -in server.crt -noout -subject -issuer -ext subjectAltName
 ```
 
+Besides the certificate details, `make-certs.sh` prints two `-----` lines, `Certificate request self-signature ok`, `subject=CN=localhost` and `server.crt: OK`. They are normal.
+
 ### Step 2: Install the certificate and key where nginx expects them.
 
 ```bash
@@ -52,7 +54,9 @@ sudo nginx -t && sudo systemctl reload nginx
 sudo ufw allow 443/tcp
 ```
 
-`http2 on;` needs nginx 1.25.1 or later. On older nginx use `config/nginx/tls-legacy.conf`, which puts `http2` on the `listen` line.
+`http2 on;` needs nginx 1.25.1 or later. On older nginx use `config/nginx/tls-legacy.conf`, which puts `http2` on the `listen` line. Like `proxy.conf`, both proxy only `/healthz`.
+
+**On a public cloud VM**, `ufw allow 443/tcp` opens 443 to the internet unless the provider's firewall stops it. As in Lab 12.1, keep the provider firewall in front and allow 443/tcp there from your own public IP only, for step 6.
 
 ### Step 4: Test the redirect, then HTTPS with HTTP/2.
 
@@ -66,10 +70,10 @@ curl -sv --cacert ca.crt --http2 https://localhost/healthz 2>&1 | grep -E 'ALPN|
 
 ```bash
 openssl s_client -connect 127.0.0.1:443 -servername localhost -alpn h2 -CAfile ca.crt </dev/null 2>/dev/null \
-  | grep -E 'ALPN|Verify return|Protocol'
+  | grep -a -E 'ALPN|Verify return|Protocol'
 ```
 
-ALPN is how client and server agree on h2 during the TLS handshake. `Verify return code: 0 (ok)` means the chain checks out against your CA.
+`-a` makes grep treat the output as text: once h2 is agreed, the server's binary SETTINGS frame reaches stdout too. ALPN is how client and server agree on h2 during the TLS handshake. `Verify return code: 0 (ok)` means the chain checks out against your CA.
 
 ### Step 6: Reach it from the host.
 
@@ -80,7 +84,7 @@ curl --cacert ca.crt --resolve shikumi.test:443:VM_IP \
   https://shikumi.test/healthz
 ```
 
-`USER@VM_IP` is your VM login, as in Lab 1.3, and `VM_IP` the address from Lab 9.1. With Vagrant, copy the file with `vagrant ssh -c 'cat labs/12.2/ca.crt' > ca.crt` instead. On a cloud VM, the provider's firewall must allow port 443.
+`USER@VM_IP` is your VM login, as in Lab 1.3, and `VM_IP` the address from Lab 9.1. With Vagrant, copy the file with `vagrant ssh -c 'cat labs/12.2/ca.crt' > ca.crt` instead. On a cloud VM, that needs a provider-firewall rule for 443/tcp from your own public IP only (step 3); remove it when you're done.
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
@@ -95,6 +99,7 @@ curl --cacert ca.crt --resolve shikumi.test:443:VM_IP \
 - `https://localhost/healthz` answers 200 over HTTP/2 when verified against `ca.crt`
 - `http://127.0.0.1/healthz` redirects with 301
 - ufw allows 443/tcp, and `server.crt` verifies against `ca.crt`
+- Only `/healthz` is proxied: `/alloc` over HTTPS returns 404
 
 ## Stretch challenge
 

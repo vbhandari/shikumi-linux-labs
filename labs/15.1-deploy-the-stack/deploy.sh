@@ -71,5 +71,22 @@ ufw allow 80/tcp >/dev/null
 ufw allow 443/tcp >/dev/null
 ufw --force enable >/dev/null
 
+step "Exposure"
+# nginx must proxy only /healthz, and the units must cap memory.
+code="$(curl -s -m 5 --cacert "$tls/ca.crt" -o /dev/null \
+  -w '%{http_code}' 'https://127.0.0.1/alloc?mb=0' || true)"
+if [[ $code != 404 ]]; then
+  echo "nginx answers /alloc with ${code:-nothing}, not 404."
+  echo "Check /etc/nginx/sites-available/shikumi."
+  exit 1
+fi
+for p in 8001 8002; do
+  mm="$(systemctl show -p MemoryMax --value "shikumi-api@$p")"
+  [[ $mm != infinity ]] || { echo "shikumi-api@$p has no MemoryMax"; exit 1; }
+done
+echo "nginx proxies only /healthz; both instances are capped at $mm bytes."
+echo "ufw allows 80 and 443 from anywhere. On a cloud VM, keep the"
+echo "provider's firewall in front: SSH, 80 and 443 from your IP only."
+
 step "Done"
 echo "CA certificate for clients: $tls/ca.crt"

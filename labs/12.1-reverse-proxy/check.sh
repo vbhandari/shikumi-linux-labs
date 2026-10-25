@@ -12,4 +12,5 @@ check "ufw allows 80/tcp" bash -c "sudo ufw status | grep -q '^80/tcp .*ALLOW'"
 out="$(python3 "$SHIKUMI_REPO/app/loadgen.py" http://127.0.0.1/healthz -c 10 -n 200 --by-pid 2>&1)"
 n="$(grep -o 'by_pid={.*}' <<<"$out" | grep -o ':' | wc -l)"
 check "responses came from two PIDs ($n)" test "$n" -eq 2
+check "nginx refuses /alloc (404)" test "$(http_status 'http://127.0.0.1/alloc?mb=0')" = 404
 finish

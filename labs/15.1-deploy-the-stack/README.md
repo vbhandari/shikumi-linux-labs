@@ -29,7 +29,9 @@ cd ~/labs/15.1
 less ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/deploy.sh
 ```
 
-Each block repeats a lab you have done: 2.2, 5.1, 5.3, 5.4, 6.2, 11.1, 12.1 and 12.2. Every command is safe to run twice. `deploy.sh` sits at the lab's root and runs from the repo; it is not copied to `~/labs`. It puts `ca.crt`, `server.crt` and `server.key` in `/etc/nginx/shikumi-tls/` and deletes the CA key, which nothing on the stack needs.
+Each block repeats a lab you have done: 2.2, 5.1, 5.3, 5.4, 6.2, 11.1, 12.1 and 12.2. Every command is safe to run twice. `deploy.sh` sits at the lab's root and runs from the repo; it is not copied to `~/labs`. It puts `ca.crt`, `server.crt` and `server.key` in `/etc/nginx/shikumi-tls/` and deletes the CA key, which nothing on the stack needs. Its last step, *Exposure*, stops with an error unless nginx answers 404 for `/alloc` and both instances have a `MemoryMax=`: the site proxies only `/healthz`, and the units cap memory at 256 MB.
+
+**On a public cloud VM**, the *Firewall* step opens 80 and 443 in ufw to the whole internet. Keep the provider's firewall from Lab 0.1 in front (inbound SSH from your own IP only), and allow 80 and 443 there only from your own IP, if at all.
 
 ### Step 2: Run it.
 
@@ -89,7 +91,8 @@ Lab 15.2 breaks this stack seven times. `break.sh --undo` repairs it; if a drill
 ```
 
 - `shikumi-api@8001` and `@8002` are enabled, active and confined by the AppArmor profile in enforce mode, with exposure below 5.0
-- nginx serves `https://localhost/healthz` over HTTP/2 with the lab CA, and redirects HTTP with 301
+- nginx serves `https://localhost/healthz` over HTTP/2 with the lab CA, redirects HTTP with 301, and answers 404 for `/alloc`
+- Both instances have `MemoryMax=256M` and `TasksMax=64`
 - ufw is active and allows OpenSSH, 80/tcp and 443/tcp; its undo timer is not pending
 - The journal is persistent and `shikumi-prune.timer` is active
 
