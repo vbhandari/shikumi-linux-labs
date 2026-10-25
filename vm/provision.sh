@@ -26,19 +26,29 @@ if [[ $FAMILY == fedora ]]; then
   systemctl enable --now firewalld
   firewall-cmd --permanent --add-service=ssh && firewall-cmd --reload
 else
-  export DEBIAN_FRONTEND=noninteractive
-  apt-get update
-  apt-get install -y "${PKGS[@]}"
+  # Never wait for input: no debconf or needrestart
+  # prompts, keep existing config files, and keep apt
+  # away from the terminal.
+  export DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a
+  export NEEDRESTART_SUSPEND=1
+  APT=(-y -o Dpkg::Use-Pty=0
+    -o Dpkg::Options::=--force-confdef
+    -o Dpkg::Options::=--force-confold)
+  apt-get update </dev/null
+  apt-get install "${APT[@]}" "${PKGS[@]}" </dev/null
   if [[ $FAMILY == ubuntu ]]; then
     # perf must match the running kernel; linux-tools-generic follows future kernels.
-    apt-get install -y "linux-tools-$(uname -r)" || echo "note: no linux-tools for $(uname -r)"
+    apt-get install "${APT[@]}" "linux-tools-$(uname -r)" \
+      </dev/null ||
+      echo "note: no linux-tools for $(uname -r)"
   fi
 fi
 
 # netem (network fault injection) lives in an extra modules package on some kernels.
 if ! modprobe -q sch_netem; then
   case $FAMILY in
-    ubuntu) apt-get install -y "linux-modules-extra-$(uname -r)" || true ;;
+    ubuntu) apt-get install "${APT[@]}" </dev/null \
+              "linux-modules-extra-$(uname -r)" || true ;;
     fedora) dnf -y install "kernel-modules-extra-$(uname -r)" || true ;;
   esac
   modprobe -q sch_netem || echo "note: sch_netem is unavailable; Lab 11.4 will not work"

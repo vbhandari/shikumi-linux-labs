@@ -8,9 +8,19 @@ command -v apt-get >/dev/null || { echo "deploy.sh covers Ubuntu only"; exit 1; 
 step() { printf '\n== %s\n' "$*"; }
 
 step "Packages"
-export DEBIAN_FRONTEND=noninteractive
-apt-get update -q >/dev/null
-apt-get install -y -q nginx apparmor-utils ufw openssl >/dev/null
+# No prompts and no terminal: apt, dpkg and needrestart must
+# never wait for input (a first run once sat stopped here).
+# Set inside the script, so sudo's env_reset cannot drop it.
+export DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a
+export NEEDRESTART_SUSPEND=1
+APT=(-y -q -o Dpkg::Use-Pty=0
+  -o Dpkg::Options::=--force-confdef
+  -o Dpkg::Options::=--force-confold)
+apt-get update -q </dev/null >/dev/null
+echo "apt-get update ok"
+logger -t shikumi-deploy "apt-get update ok" || true
+apt-get install "${APT[@]}" nginx apparmor-utils ufw openssl \
+  </dev/null >/dev/null
 
 step "Persistent journal"
 if [[ ! -d /var/log/journal ]]; then

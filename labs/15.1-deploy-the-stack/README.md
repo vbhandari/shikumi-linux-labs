@@ -42,11 +42,12 @@ sudo ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/deploy.sh
 ### Step 3: Confirm SSH still works, then cancel the firewall undo.
 
 ```bash
-systemctl is-active --quiet shikumi-ufw-revert.timer &&
+if systemctl is-active --quiet shikumi-ufw-revert.timer; then
   sudo systemctl stop shikumi-ufw-revert.timer
+fi
 ```
 
-Open a new SSH session from the host first. If it fails, wait 10 minutes: ufw turns itself off. `deploy.sh` arms the undo only when ufw was not active yet, so if ufw was already on (after Lab 11.1, or on a second run) there is no timer and this step does nothing.
+Open a new SSH session from the host first. If it fails, wait 10 minutes: ufw turns itself off. `deploy.sh` arms the undo only when ufw was not active yet, so if ufw was already on (after Lab 11.1, or on a second run) there is no timer and this step does nothing; `echo $?` after it still prints `0`.
 
 ### Step 4: Check each layer yourself, then run the check.
 
