@@ -31,7 +31,8 @@ perf --version
 sysctl kernel.perf_event_paranoid kernel.kptr_restrict
 sudo perf stat -e cycles true 2>&1 |
   grep -E 'cycles|supported'
-sudo perf stat -e cpu-clock,context-switches sleep 1 2>&1 | tail -n 6
+sudo perf stat -e cpu-clock,context-switches sleep 1 2>&1 |
+  grep -E 'cpu-clock|context-switches'
 ```
 
 The `cycles` line shows a count if the VM passes the hardware counters through, or `<not supported>` if it hides them, as many VMs do. The software event `cpu-clock` always works. `sudo` is needed because of `perf_event_paranoid` and `kptr_restrict`.
