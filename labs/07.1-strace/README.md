@@ -91,6 +91,7 @@ Trace the app while it fails a request: run `strace -f -e trace=openat` on a cop
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/07.1-strace/cleanup.sh
 ```
 

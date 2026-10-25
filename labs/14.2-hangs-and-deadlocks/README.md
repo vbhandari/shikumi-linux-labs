@@ -83,6 +83,7 @@ Install `py-spy` in a virtual environment (`python3 -m venv ~/venv && ~/venv/bin
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/14.2-hangs-and-deadlocks/cleanup.sh
 ```
 

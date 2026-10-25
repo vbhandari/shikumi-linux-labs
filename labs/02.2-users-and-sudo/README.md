@@ -95,6 +95,7 @@ Give `deployer` a password (`sudo passwd deployer`), switch to it with `su - dep
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/02.2-users-and-sudo/cleanup.sh
 ```
 

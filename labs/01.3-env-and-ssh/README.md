@@ -95,6 +95,7 @@ Put the `export` lines in `~/.bashrc`, open a new SSH session and confirm `env |
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/01.3-env-and-ssh/cleanup.sh
 ```
 

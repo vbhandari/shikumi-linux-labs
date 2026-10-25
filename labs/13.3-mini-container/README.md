@@ -132,6 +132,7 @@ Run the same container without sudo: `./mini-container.sh --rootless rootfs`. In
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/13.3-mini-container/cleanup.sh
 ```
 

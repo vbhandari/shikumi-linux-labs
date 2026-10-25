@@ -104,6 +104,7 @@ Add `--retries 0` and find the loss rate at which more than 10 % of requests fai
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/11.4-netem-faults/cleanup.sh
 ```
 

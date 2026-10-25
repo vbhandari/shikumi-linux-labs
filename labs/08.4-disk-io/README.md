@@ -83,6 +83,7 @@ Repeat the fsync job with `--bs=64k`. Does throughput (MB/s) or IOPS change more
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/08.4-disk-io/cleanup.sh
 ```
 

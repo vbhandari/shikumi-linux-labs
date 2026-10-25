@@ -89,7 +89,7 @@ sudo systemctl daemon-reload && sudo systemctl restart shikumi-api
 curl -s http://127.0.0.1:8000/healthz; echo
 ```
 
-This lab restarts the service six times. The unit allows 10 starts in 30 seconds (`StartLimitBurst=`, `StartLimitIntervalSec=`), more than systemd's default of 5 in 10, so pasting the steps quickly is fine. If a restart still fails with `start of the service was attempted too often`, run `sudo systemctl reset-failed shikumi-api`, then `sudo systemctl start shikumi-api`.
+This lab restarts the service six times. The unit allows 20 starts in 60 seconds (`StartLimitBurst=`, `StartLimitIntervalSec=`), well above systemd's default of 5 in 10, and `setup.sh` resets the counter, so pasting the steps quickly is fine. If a restart still fails with `start of the service was attempted too often`, run `sudo systemctl reset-failed shikumi-api`, then `sudo systemctl start shikumi-api`.
 
 ## Checks (expected output)
 
@@ -109,6 +109,7 @@ Remove one line at a time from a copy of `hardening.conf` (try `SystemCallFilter
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/05.3-sandboxing/cleanup.sh
 ```
 

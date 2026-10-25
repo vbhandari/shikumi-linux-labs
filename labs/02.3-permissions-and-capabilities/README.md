@@ -110,6 +110,7 @@ Find every setuid binary on the system with `find / -xdev -perm -4000 -type f 2>
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/02.3-permissions-and-capabilities/cleanup.sh
 ```
 

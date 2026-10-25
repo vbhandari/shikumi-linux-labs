@@ -115,6 +115,7 @@ Extend `request_latency.bt` to also print a histogram per instance (`@request_ms
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/14.4-ebpf-tools/cleanup.sh
 ```
 

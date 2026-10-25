@@ -150,6 +150,7 @@ Find the abstractions your profile includes in `/etc/apparmor.d/abstractions/` a
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/06.1-first-apparmor-profile/cleanup.sh
 ```
 

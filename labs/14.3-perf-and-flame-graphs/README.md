@@ -126,6 +126,7 @@ Profile `shikumi-api@8001` while nginx proxies `/checksum` to it. What does perf
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/14.3-perf-and-flame-graphs/cleanup.sh
 ```
 

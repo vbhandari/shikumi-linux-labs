@@ -78,6 +78,7 @@ Run two copies of `mmapdemo.py` on the same file and compare their `Pss` in `sma
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/08.1-virtual-memory/cleanup.sh
 ```
 

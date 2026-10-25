@@ -85,6 +85,7 @@ Check the backlog of the real services: `ss -lnt 'sport = :8001'`. Which value i
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/10.2-accept-queue/cleanup.sh
 ```
 

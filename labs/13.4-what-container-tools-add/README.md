@@ -96,6 +96,7 @@ Run `podman run --rm --cap-drop=all alpine:3.24 grep Cap /proc/self/status` and 
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/13.4-what-container-tools-add/cleanup.sh
 ```
 

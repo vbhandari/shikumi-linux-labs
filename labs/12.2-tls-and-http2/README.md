@@ -103,6 +103,7 @@ Add `add_header Strict-Transport-Security "max-age=300" always;` to the 443 serv
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/12.2-tls-and-http2/cleanup.sh
 ```
 

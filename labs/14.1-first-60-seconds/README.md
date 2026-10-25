@@ -80,6 +80,7 @@ Find the culprit process for each kind, not just the resource: which `pidstat` f
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/14.1-first-60-seconds/cleanup.sh
 ```
 

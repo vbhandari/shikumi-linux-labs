@@ -82,6 +82,7 @@ Find the process on the VM with the most open descriptors: `sudo ls /proc/*/fd 2
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/03.3-file-descriptors-and-limits/cleanup.sh
 ```
 

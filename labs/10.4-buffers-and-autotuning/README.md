@@ -80,6 +80,7 @@ Compute the bandwidth-delay product for 1 Gbit/s at 100 ms RTT. Is the default `
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/10.4-buffers-and-autotuning/cleanup.sh
 ```
 

@@ -77,6 +77,7 @@ Capture the same request through nginx in Lab 12.1 with `-i lo port 80 or port 8
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/09.3-sockets-and-ports/cleanup.sh
 ```
 

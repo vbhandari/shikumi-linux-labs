@@ -106,6 +106,7 @@ Make the service fail to start on purpose (`ExecStart=/opt/shikumi/bin/missing` 
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/05.1-first-unit/cleanup.sh
 ```
 

@@ -120,6 +120,7 @@ Use `sudo ufw deny from VM_HOST_IP to any port 8010` (find the host's address in
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/11.1-ufw-and-nftables/cleanup.sh
 ```
 

@@ -93,6 +93,7 @@ Run the same command with `-p MemoryHigh=80M -p MemoryMax=120M`. What changes be
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/08.3-oom-killer/cleanup.sh
 ```
 

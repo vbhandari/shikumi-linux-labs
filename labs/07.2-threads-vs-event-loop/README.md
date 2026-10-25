@@ -78,6 +78,7 @@ Run `loadgen.py -c 100` against both servers and compare `grep Threads /proc/PID
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/07.2-threads-vs-event-loop/cleanup.sh
 ```
 

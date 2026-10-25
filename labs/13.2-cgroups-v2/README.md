@@ -82,6 +82,7 @@ Add `memory.max` 50M to the `shikumi` group and move `python3 ~/shikumi-linux-la
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/13.2-cgroups-v2/cleanup.sh
 ```
 

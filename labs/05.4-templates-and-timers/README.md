@@ -99,6 +99,7 @@ Change the timer to run every 5 minutes with a drop-in (`OnUnitActiveSec=` must 
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/05.4-templates-and-timers/cleanup.sh
 ```
 

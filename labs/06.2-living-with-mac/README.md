@@ -117,6 +117,7 @@ Point the cache at `/var/lib/shikumi/cache` instead (`SHIKUMI_CACHE_DIR=` in `ca
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/06.2-living-with-mac/cleanup.sh
 ```
 

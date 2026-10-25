@@ -100,6 +100,7 @@ Find which package owns `/usr/bin/ss` and list its other files. Then find a file
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/04.1-installing-software/cleanup.sh
 ```
 

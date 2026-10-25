@@ -77,6 +77,7 @@ Write drill 8 yourself: a fault the course taught but `break.sh` does not inject
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/15.2-incident-drills/cleanup.sh
 ```
 

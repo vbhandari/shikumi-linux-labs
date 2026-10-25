@@ -90,6 +90,7 @@ Stop one of the two listeners in step 1 halfway through a `loadgen.py` run. Do a
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/10.3-socket-options/cleanup.sh
 ```
 

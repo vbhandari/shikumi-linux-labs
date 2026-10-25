@@ -86,6 +86,7 @@ Find out which DNS server the stub forwards to (`resolvectl dns`) and query it d
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/09.2-name-resolution/cleanup.sh
 ```
 

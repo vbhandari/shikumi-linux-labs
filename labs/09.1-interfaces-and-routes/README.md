@@ -88,6 +88,7 @@ Lower the uplink MTU to 1400 for this boot only (`sudo ip link set dev UPLINK mt
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/09.1-interfaces-and-routes/cleanup.sh
 ```
 

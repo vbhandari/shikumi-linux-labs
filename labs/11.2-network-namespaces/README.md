@@ -85,6 +85,7 @@ Look at blue's nftables ruleset (`sudo ip netns exec blue nft list ruleset`). Wh
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/11.2-network-namespaces/cleanup.sh
 ```
 

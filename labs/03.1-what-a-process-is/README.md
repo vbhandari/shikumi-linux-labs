@@ -87,6 +87,7 @@ Find the process with the most threads on the VM: `ps -eo nlwp,pid,cmd --sort=-n
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/03.1-what-a-process-is/cleanup.sh
 ```
 

@@ -67,7 +67,9 @@ From here on, every command runs inside the VM unless a step says *on the host*.
 
 ```bash
 sudo apt-get install -y git      # if git is missing
-git clone https://github.com/vbhandari/shikumi-linux-labs.git
+[ -d ~/shikumi-linux-labs/.git ] || git clone \
+  https://github.com/vbhandari/shikumi-linux-labs.git \
+  ~/shikumi-linux-labs
 sudo bash ~/shikumi-linux-labs/vm/provision.sh
 ```
 
@@ -141,6 +143,7 @@ Run `multipass info shikumi` (or `vagrant ssh-config`) and note the VM's IP addr
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/00.1-provision-and-verify/cleanup.sh
 ```
 

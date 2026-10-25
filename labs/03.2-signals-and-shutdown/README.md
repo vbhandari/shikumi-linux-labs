@@ -82,6 +82,7 @@ Run `sleep 600 &` then `kill -HUP` it and read `$?` after `wait`. Which number d
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/03.2-signals-and-shutdown/cleanup.sh
 ```
 

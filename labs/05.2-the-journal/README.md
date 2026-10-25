@@ -93,6 +93,7 @@ Show only the app's own output, without systemd's lines: filter on `_COMM=` or `
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/05.2-the-journal/cleanup.sh
 ```
 

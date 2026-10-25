@@ -85,6 +85,7 @@ Convert the log to JSON lines with `awk` and answer question 2 again with `jq`: 
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/01.2-pipes-and-text/cleanup.sh
 ```
 

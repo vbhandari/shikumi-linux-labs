@@ -125,6 +125,7 @@ Remove the ufw route rule and use `nft monitor trace` to find exactly which chai
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/11.3-routing-and-nat/cleanup.sh
 ```
 

@@ -125,6 +125,7 @@ Find every deleted-but-open file on the whole VM with `sudo lsof +L1`. Which ser
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/02.1-disk-full/cleanup.sh
 ```
 

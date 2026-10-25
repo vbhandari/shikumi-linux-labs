@@ -85,6 +85,7 @@ Make the deploy atomic: copy the release into `site/next`, then swap it into pla
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/01.1-safe-scripts/cleanup.sh
 ```
 

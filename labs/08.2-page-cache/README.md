@@ -89,6 +89,7 @@ Find which files of the running service are in the page cache: `sudo fincore /us
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/08.2-page-cache/cleanup.sh
 ```
 

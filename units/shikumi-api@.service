@@ -1,10 +1,12 @@
 [Unit]
 Description=shikumi-api sample service on port %i (Shikumi Labs)
 After=network.target
-# The default is 5 starts in 10 s, which pasting Lab 5.3
-# quickly (6 restarts) hits. A crash loop still trips this.
-StartLimitIntervalSec=30s
-StartLimitBurst=10
+# Default: 5 starts in 10 s. Labs 5.1 and 5.3 pasted back to
+# back start it 12 times in about 25 s, so allow 20 in 60 s.
+# A crash loop (RestartSec=1, about 1.1 s per start) still
+# trips it after about 22 s.
+StartLimitIntervalSec=60s
+StartLimitBurst=20
 
 [Service]
 # The app sends READY=1 to $NOTIFY_SOCKET when it listens,

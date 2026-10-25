@@ -79,6 +79,7 @@ Use `with conn:` instead of an explicit `close()`. Then make a request time out 
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/10.1-close-wait/cleanup.sh
 ```
 

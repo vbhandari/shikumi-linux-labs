@@ -101,6 +101,7 @@ Add `proxy_next_upstream_tries 1;` and repeat step 4. What does the client see n
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/12.1-reverse-proxy/cleanup.sh
 ```
 

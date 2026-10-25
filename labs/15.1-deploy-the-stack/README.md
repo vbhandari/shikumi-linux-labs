@@ -100,6 +100,7 @@ Add a `--check` flag to `deploy.sh` that reports what it *would* change without 
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/15.1-deploy-the-stack/cleanup.sh
 ```
 

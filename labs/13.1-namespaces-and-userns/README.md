@@ -112,6 +112,7 @@ Find every profile on the VM that grants `userns`: `sudo grep -l 'userns,' /etc/
 ## Cleanup
 
 ```bash
+cd ~
 ~/shikumi-linux-labs/labs/13.1-namespaces-and-userns/cleanup.sh
 ```
 
