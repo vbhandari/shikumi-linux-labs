@@ -8,11 +8,15 @@ tracepoint:syscalls:sys_exit_accept4
   @start[pid, args.ret] = nsecs;
 }
 
+// args.ret is a signed long and args.fd an unsigned int.
+// Cast fd so both map keys have the same type, or
+// bpftrace 0.25 stops with "Argument mismatch for @start".
 tracepoint:syscalls:sys_enter_close
-/@start[pid, args.fd]/
+/@start[pid, (int64)args.fd]/
 {
-  @request_ms = hist((nsecs - @start[pid, args.fd]) / 1000000);
-  delete(@start[pid, args.fd]);
+  $fd = (int64)args.fd;
+  @request_ms = hist((nsecs - @start[pid, $fd]) / 1000000);
+  delete(@start[pid, $fd]);
 }
 
 END

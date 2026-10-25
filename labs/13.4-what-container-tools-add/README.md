@@ -54,17 +54,22 @@ cat /proc/$PID/uid_map
 
 ```bash
 cat /proc/$PID/cgroup
-systemd-cgls --no-pager --user-unit 2>/dev/null | grep -B 3 'sleep 600' || systemd-cgls --no-pager | grep -B 3 'sleep 600'
+systemd-cgls --no-pager --user-unit 2>/dev/null |
+  grep -B 3 '[s]leep 600' ||
+  systemd-cgls --no-pager | grep -B 3 '[s]leep 600'
 ```
+
+`[s]leep 600` still matches the container's `sleep 600`, but not grep's own command line, which reads `[s]leep`.
 
 ### Step 5: Find its root filesystem.
 
 ```bash
-sudo findmnt -N "$PID" -o TARGET,SOURCE,FSTYPE,OPTIONS /
+sudo findmnt -N "$PID" -o TARGET,SOURCE,FSTYPE /
+sudo findmnt -N "$PID" -n -o OPTIONS / | tr ',' '\n'
 podman image inspect alpine:3.24 -f '{{.RootFS.Layers}}'
 ```
 
-`findmnt -N` runs the host's `findmnt` on the container's mount table (Alpine has no `findmnt`, so `nsenter -m findmnt` fails). The root is an overlay: read-only image layers below, a writable layer per container on top.
+`findmnt -N` runs the host's `findmnt` on the container's mount table (Alpine has no `findmnt`, so `nsenter -m findmnt` fails). The root is an overlay: read-only image layers below, a writable layer per container on top. The options get their own command, one per line: on one line they are so long that `findmnt` shortens the other columns, and `overlay` shows as `overla`.
 
 ### Step 6: Find its capabilities and seccomp filter.
 

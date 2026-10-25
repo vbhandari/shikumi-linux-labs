@@ -7,8 +7,10 @@ Optional reading for the handout's Appendix C. These are not labs, and nothing i
 | [`epoll_echo.c`](epoll_echo.c) | C1, from E07.2 | The readiness loop asyncio runs for you: `epoll_wait`, non-blocking `accept4`, `read`, `write` |
 | [`deadlock.c`](deadlock.c) | C2, from Lab 14.2 | The lock-order inversion from `deadlock.py`, debugged with `gdb` |
 
+Paste one block at a time. First build both and try the epoll server (from `~/shikumi-linux-labs/appendix-c`):
+
 ```bash
-sudo apt install -y gcc make gdb
+sudo apt install -y build-essential gdb
 make
 ./epoll_echo &
 sudo true           # strace needs sudo to attach on Ubuntu
@@ -17,16 +19,30 @@ sudo strace -f -e trace=epoll_wait,accept4,read,write \
 sleep 1
 printf 'hello\n' | nc -q1 127.0.0.1 9000
 sudo pkill -x strace; kill %1
+```
+
+`build-essential` brings `gcc`, `make` and the C library headers (`libc6-dev`). `gcc` alone may leave the headers out, and then `make` stops at `arpa/inet.h: No such file or directory`.
+
+Then run the deadlock. Both threads start at once, so it usually hangs straight away and prints `transfers=0` every second (`deadlock.py` in Lab 14.2 counts for about two seconds first):
+
+```bash
 ./deadlock
-# wait until transfers= stops growing, then in a second
-# terminal:
+```
+
+In a second terminal, while it hangs:
+
+```bash
 sudo gdb -p "$(pgrep -x deadlock)" -batch \
   -ex 'thread apply all bt'
-# back in the first terminal: Ctrl-C to stop ./deadlock
+```
+
+Back in the first terminal, press Ctrl-C to stop `./deadlock`, then:
+
+```bash
 make clean
 ```
 
-`gdb -p` attaches with ptrace, which Ubuntu limits to your own child processes (`kernel.yama.ptrace_scope = 1`), so it needs `sudo`.
+`gdb -p` attaches with ptrace, which Ubuntu limits to your own child processes (`kernel.yama.ptrace_scope = 1`), so it needs `sudo`. One thread waits in `pthread_mutex_lock` called from `transfer`, the other from `report`. Without the C library's debug symbols, the frames below `pthread_mutex_lock` show as `??`.
 
 ---
 

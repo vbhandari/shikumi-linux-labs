@@ -41,7 +41,9 @@ int main(void) {
     pthread_create(&b, NULL, report, NULL);
     for (;;) {
         sleep(1);
-        printf("transfers=%lu\n", transfers);   /* stops growing once hung */
+        /* Usually stays at transfers=0: both threads start
+         * together and deadlock almost at once. */
+        printf("transfers=%lu\n", transfers);
         fflush(stdout);
     }
 }

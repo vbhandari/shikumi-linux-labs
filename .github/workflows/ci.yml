@@ -70,11 +70,22 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - run: sudo apt-get update && sudo apt-get install -y bpftrace gcc make
-      # Parse and type-check every script without loading it: a syntax error
-      # or an unknown builtin fails the job.
-      - name: bpftrace parse check
+      # bpftrace -l only parses a script and lists its probes: it skips the
+      # semantic pass, so it accepted request_latency.bt while bpftrace 0.25
+      # rejects it (map key (uint32,uint64) vs (uint32,int64)). --mode
+      # codegen runs the parser, the semantic and type checks and LLVM
+      # codegen, then exits without loading anything, so it fails on type
+      # errors whatever the runner's kernel can attach. (--emit-elf, -d and
+      # --emit-llvm go on to attach and run.) The lab templates still have
+      # TODOs (undefined maps), so they only get the parse check.
+      - name: bpftrace type check (reference scripts)
         run: |
-          for f in bpf/*.bt labs/14.4-ebpf-tools/files/*.bt; do
+          for f in bpf/*.bt; do
+            echo "== $f"; sudo timeout 120 bpftrace --mode codegen "$f" >/dev/null
+          done
+      - name: bpftrace parse check (lab templates)
+        run: |
+          for f in labs/14.4-ebpf-tools/files/*.bt; do
             echo "== $f"; sudo bpftrace -l "$f" >/dev/null
           done
       # Loading and attaching depends on the runner's kernel, not on our

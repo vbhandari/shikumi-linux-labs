@@ -28,7 +28,7 @@ cd ~/labs/13.1
 
 ```bash
 ls -l /proc/self/ns
-lsns -t uts,pid,net | head
+lsns -t uts -t pid -t net | head
 ```
 
 ### Step 2: Start a shell with its own hostname and PID namespace.

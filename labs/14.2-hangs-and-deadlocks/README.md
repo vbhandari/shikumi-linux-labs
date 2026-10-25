@@ -34,12 +34,15 @@ python3 deadlock.py 2> stacks.txt
 ### Step 2: In a second terminal, look at its threads.
 
 ```bash
+cd ~/labs/14.2
 PID=$(pgrep -f 'deadlock.py' | head -n1)
 ps -L -o tid,stat,pcpu,comm -p "$PID"
-cat /proc/$PID/task/*/wchan; echo
+for t in /proc/$PID/task/*; do
+  echo "$(cat "$t/comm") $(cat "$t/wchan")"
+done
 ```
 
-Every thread sleeps (`S`) using no CPU. A hang with idle CPU means waiting, not working. `wchan` names the kernel function each thread waits in: a futex wait.
+A new terminal starts in your home directory, hence the `cd`: step 4 reads `stacks.txt` here. Every thread sleeps (`S`) using no CPU. A hang with idle CPU means waiting, not working. `wchan` names the kernel function each thread waits in: the main thread in a sleep (`hrtimer_nanosleep`), the two workers in a futex wait (`futex_do_wait` on Ubuntu 26.04's kernel).
 
 ### Step 3: See the waits as system calls.
 

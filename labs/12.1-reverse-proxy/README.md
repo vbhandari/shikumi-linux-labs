@@ -101,6 +101,7 @@ Every request now comes from 127.0.0.1, which is nginx. The `X-Forwarded-For` he
 - ufw allows 80/tcp
 - 200 requests through port 80 are answered by two different PIDs
 - Only `/healthz` is proxied: `/alloc` through port 80 returns 404
+- Once Lab 12.2 is done, port 80 only redirects (301), so the check skips the two port-80 checks with a NOTE; Lab 12.2's check covers them over HTTPS
 
 ## Stretch challenge
 

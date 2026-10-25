@@ -8,8 +8,10 @@ tracepoint:syscalls:sys_exit_accept4
   // TODO: remember the time, keyed by process and the new file descriptor (args.ret)
 }
 
+// args.fd is unsigned and args.ret signed: the cast keeps the
+// key types the same, which bpftrace requires.
 tracepoint:syscalls:sys_enter_close
-/@start[pid, args.fd]/
+/@start[pid, (int64)args.fd]/
 {
   // TODO: add the elapsed time in ms to a histogram @request_ms, then forget the start time
 }
