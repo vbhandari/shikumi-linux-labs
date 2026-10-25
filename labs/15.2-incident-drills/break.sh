@@ -24,6 +24,8 @@ fault_2() {
   systemd-run --quiet --unit shikumi-drill-2a -p DynamicUser=yes -p StandardOutput=null python3 "$STATE/worker-2.py"
   systemd-run --quiet --unit shikumi-drill-2b -p DynamicUser=yes \
     bash -c 'while :; do curl -s -m 1 -o /dev/null http://127.0.0.1:8200/; sleep 0.2; done'
+  # Wait for the first leaked socket, so a check run straight away already fails.
+  for _ in {1..50}; do [[ -n "$(ss -Htan state close-wait)" ]] && break; sleep 0.1; done
 }
 fault_3() {
   fallocate -l 64M /var/tmp/shikumi-drill.img
