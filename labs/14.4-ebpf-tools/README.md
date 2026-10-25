@@ -59,7 +59,7 @@ done
 wait
 ```
 
-Since Lab 12.2, port 80 only redirects, so the requests go to HTTPS (`-k` skips verification for this quick test). Each one shows nginx connecting to 127.0.0.1 port 8001 or 8002.
+Since Lab 12.2, port 80 only redirects, so the requests go to HTTPS, and `--cacert` makes curl trust the lab CA from Lab 12.2. Each one shows nginx connecting to 127.0.0.1 port 8001 or 8002.
 
 ### Step 4: Try three more tools.
 

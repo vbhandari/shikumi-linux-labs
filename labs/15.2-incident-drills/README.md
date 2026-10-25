@@ -58,7 +58,7 @@ Then inject the next fault, 2 to 7. If you are stuck, `sudo .../break.sh --undo`
 
 > **Fedora / RHEL-family (alternate path, untested)**
 >
-> `break.sh` targets Ubuntu only. On Fedora, any denial you meet is SELinux's: `ausearch -m avc -ts recent`.
+> `break.sh` targets Ubuntu only, so the drills don't run on Fedora.
 
 ## Checks (expected output)
 

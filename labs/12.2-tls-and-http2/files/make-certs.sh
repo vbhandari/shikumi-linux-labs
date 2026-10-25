@@ -2,10 +2,11 @@
 # Make a lab CA and a server certificate for localhost,
 # 127.0.0.1 and shikumi.test.
 set -euo pipefail
-openssl req -x509 -newkey rsa:2048 -nodes -days 3650 \
+openssl req -quiet -x509 -newkey rsa:2048 -nodes -days 3650 \
   -subj "/CN=Shikumi Lab CA" \
   -keyout ca.key -out ca.crt
-openssl req -newkey rsa:2048 -nodes -subj "/CN=localhost" \
+openssl req -quiet -newkey rsa:2048 -nodes \
+  -subj "/CN=localhost" \
   -keyout server.key -out server.csr
 SAN=DNS:localhost,IP:127.0.0.1,DNS:shikumi.test
 printf '%s\n' "subjectAltName=$SAN" \
